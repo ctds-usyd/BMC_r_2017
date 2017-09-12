@@ -1,0 +1,111 @@
+---
+title: "The Brain & Mind Centre"
+subtitle: "Day 1"
+author: "The Sydney Informatics Hub"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: lumen
+    hightlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Welcome to the home page for the Brain & Mind Centre R course. It is a three day course covering six seperate topics that occur frequently to anyone doing pragmatic data analysis. The content is structured in such a way that the material in a section is independent to the other sections, so if you can only make part of the course this won't impact your learning.
+
+These courses are designed to be informal and free flowing, so whilst there is some material we have prepared, if you have a question then at anytime please let us know and we will be more than happy to assist. If there is anything that we can't answer on the day, we will note it down and make sure that we get back to you with a thorough solution.
+
+### Installation & Setup
+
+Below is a script that installs packages that you will need for the next three days and also sets some options which will make the course run smoothly. We will explain what the script does as we get further into the material, but for the meantime we would ask that you copy the script and run it in your environment.
+
+```{r installation, eval=FALSE, message=FALSE}
+if("ggplot2" %in% installed.packages()){
+  update.packages("ggplot2")
+  library(ggplot2)
+} else {
+  install.packages("ggplot2")
+  library(ggplot2)
+}
+if("dplyr" %in% installed.packages()){
+  update.packages("dplyr")
+  library(dplyr)
+} else {
+  install.packages("dplyr")
+  library(dplyr)
+}
+if("foreign" %in% installed.packages()){
+  update.packages("foreign")
+  library(foreign)
+} else {
+  install.packages("foreign")
+  library(foreign)
+}
+if("xlsx" %in% installed.packages()){
+  update.packages("xlsx")
+  library(xlsx)
+} else {
+  install.packages("xlsx")
+  library(xlsx)
+}
+
+options(scipen = 999)
+set.seed(5)
+```
+
+## About R
+
+### The R Programming Language
+
+[R](https://www.r-project.org/) is an open source programming language and software environment for statistical computing and graphics that is supported by the R Foundation for Statistical Computing. Today, it is one of the most popular languages, being used all across the world in a wide variety of domains and fields.
+
+### RStudio
+
+[RStudio](https://www.rstudio.com/) is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.
+
+## Getting Started
+
+### The Data
+
+The dataset that we will be using today is taken from the Queensland Government website and is [Gaming Machine Data by Local Government Areas](https://data.qld.gov.au/dataset/gaming-machine-data-by-local-government-areas). It has the following variables:
+
+Variable | Definition
+-----------------|------------------------------------------------
+Month Year | The month and year from which the gambling data is provided.
+LGA Region Name | The name of the Local Government Area.
+Approved Sites | The number of venues approved to operate electronic gaming machines.
+Operational Sites | The number of venues that were operating electronic gaming machines on the last day of the relevant month.
+Approved EGMs | The maximum number of electronic gaming machines the venue is approved to operate.
+Operational EGMs | The number of electronic gaming machines operating at the venue on the last day of the revelant month.
+Metered Win | The amount of money lost by players of eletronic gaming machines.
+
+If you haven't already, the data can be downloaded from the homepage of this course, or alternatively you can click [here](http://data.justice.qld.gov.au/JSD/OLGR/20170817_OLGR_LGA-EGM-data.csv).
+
+### Reading in Data
+
+The first thing to do before we can begin an analysis is loading some data. To do this we can use the below command.
+
+```{r read_data_1, eval=FALSE}
+data <- read.csv(file = "27062014 - DJAG - OLGR - LGA EGM data - Definitions and Disclaimers.xlsx",
+                 header = TRUE,
+                 sep = ",",
+                 stringsAsFactors = FALSE)
+```
+
+Before going any further, let's break down what this command does specifically.
+
+```{r read_data_2, eval=FALSE}
+data
+```
+CSV
+TXT
+XLSX
+SPSS
+SAS
+STATA
