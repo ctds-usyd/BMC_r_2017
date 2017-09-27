@@ -1,7 +1,7 @@
 ---
 title: "The Brain & Mind Centre"
 subtitle: "Day 1"
-author: "The Sydney Informatics Hub"
+author: "Sydney Informatics Hub"
 output:
   html_document:
     toc: true
