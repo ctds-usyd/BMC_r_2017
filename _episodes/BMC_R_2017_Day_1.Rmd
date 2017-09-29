@@ -12,7 +12,8 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      cache = FALSE)
 ```
 
 ## Introduction
@@ -26,34 +27,18 @@ These courses are designed to be informal and free flowing, so whilst there is s
 Below is a script that installs packages that you will need for the next three days and also sets some options which will make the course run smoothly. We will explain what the script does as we get further into the material, but for the meantime we would ask that you copy the script and run it in your environment.
 
 ```{r installation, eval=FALSE, message=FALSE}
-if("ggplot2" %in% installed.packages()){
-  update.packages("ggplot2")
-  library(ggplot2)
-} else {
-  install.packages("ggplot2")
-  library(ggplot2)
-}
-if("dplyr" %in% installed.packages()){
-  update.packages("dplyr")
-  library(dplyr)
-} else {
-  install.packages("dplyr")
-  library(dplyr)
-}
-if("foreign" %in% installed.packages()){
-  update.packages("foreign")
-  library(foreign)
-} else {
-  install.packages("foreign")
-  library(foreign)
-}
-if("xlsx" %in% installed.packages()){
-  update.packages("xlsx")
-  library(xlsx)
-} else {
-  install.packages("xlsx")
-  library(xlsx)
-}
+LoadPackages <- function(x){ for( i in x ){ if( ! require( i , character.only = TRUE ) ){
+  install.packages( i , dependencies = TRUE , repos = "http://cran.us.r-project.org")
+  require( i , character.only = TRUE )}}}
+
+#  Then try/install packages...
+LoadPackages(c("tidyverse",
+               "xlsx",
+               "ggplot2",
+               "foreign",
+               "dplyr"))
+
+#options(max.print = 100)
 
 options(scipen = 999)
 set.seed(5)
@@ -71,7 +56,141 @@ set.seed(5)
 
 ## Getting Started
 
-### The Data
+### Calculating things in R
+
+Standard math functions work in R:
+```{r}
+2+3
+
+1e5-5e4
+
+1/1000
+
+sqrt(2)
+
+2*pi
+```
+
+Let's use vectors:
+
+```{r}
+1:10
+
+2*(1:10)
+
+2^(1:10)
+```
+
+We can store values:
+
+```{r}
+x<-3
+x=3
+3->x
+x
+x^2
+```
+
+### Vectors
+
+We can store vectors:
+
+```{r}
+x<-1:10
+x
+2^x
+
+y<-c(3,4,5)
+y^2
+
+some.fruits<-c("apple","orange","banana")
+some.fruits
+```
+
+### Working with Simple Data
+
+A lot of the time in R we are working with tables of data, know as "data frames". 
+
+Commonly, 
+
+**rows** may represent instances e.g. *data points*, *people*, *events*, etc. while 
+
+**columns** will represent different types of data associated with each data point or instance e.g. *Name*, *ID*, *location*, *time*, *value*...
+
+Here is an example data frame
+
+```{r}
+simple.data<-data.frame(first.name=c("Alice",
+                                     "Bob",
+                                     "Cathy",
+                                     "Daniel"),
+                        gender=as.factor(c("Female",
+                                           "Male",
+                                           "Female",
+                                           "Male")),
+                        favourite.number=c(4,23,pi,exp(1)),
+                        favourite.letter=c("a","c","x","q"),
+                        favourite.weekday=c("Monday","Thursday","Sunday","Friday"),
+                        stringsAsFactors = FALSE)
+```
+
+### Viewing The Data
+Use the function `View()` to visually look at the data
+
+```{r eval=FALSE}
+View(simple.data)
+```
+
+How many rows do we have?
+```{r}
+nrow(simple.data)
+```
+How many columns do we have?
+```{r}
+ncol(simple.data)
+```
+
+
+### Accessing Subsets
+Return only the first 3 rows of the data set
+```{r}
+simple.data[1:3,]
+simple.data[c(1,2,3),]
+head(simple.data,3)
+```
+Return the last two rows in a data set
+```{r}
+simple.data[nrow(simple.data)+(-1:0),]
+tail(simple.data,2)
+```
+Return a random two rows from the data set
+```{r}
+sample_n(simple.data,2)
+```
+
+
+Return only the "favourite.letter" column in the data set
+```{r}
+simple.data[,4]
+simple.data[,"favourite.letter"]
+simple.data[,c("favourite.letter")]
+simple.data[,names(simple.data) %in% c("favourite.letter")]
+simple.data$favourite.letters
+```
+
+Return only the first 3 rows and columns 2 and 5 of the data set
+```{r}
+simple.data[1:3, c(2,5)]
+```
+
+Return the columns named "first.name" and "favourite.number"
+```{r}
+simple.data[,c("first.name","favourite.number")]
+```
+
+### Subsetting the data
+
+## More Realistic Data
 
 The dataset that we will be using today is taken from the Queensland Government website and is [Gaming Machine Data by Local Government Areas](https://data.qld.gov.au/dataset/gaming-machine-data-by-local-government-areas). It has the following variables:
 
@@ -91,8 +210,8 @@ If you haven't already, the data can be downloaded from the homepage of this cou
 
 The first thing to do before we can begin an analysis is loading some data. To do this we can use the below command.
 
-```{r read_data_1, eval=FALSE}
-data <- read.csv(file = "27062014 - DJAG - OLGR - LGA EGM data - Definitions and Disclaimers.xlsx",
+```{r read_data_1}
+gambling.data <- read.csv(file = "http://data.justice.qld.gov.au/JSD/OLGR/20170817_OLGR_LGA-EGM-data.csv",
                  header = TRUE,
                  sep = ",",
                  stringsAsFactors = FALSE)
@@ -100,12 +219,177 @@ data <- read.csv(file = "27062014 - DJAG - OLGR - LGA EGM data - Definitions and
 
 Before going any further, let's break down what this command does specifically.
 
-```{r read_data_2, eval=FALSE}
-data
+1. It reads the file, which could be 
+- a file path e.g. `"~/Documents/MyFolder/datafile.csv"`
+- a url like we have here e.g. `"http://www.website.com/subdomain/datafile.csv"`
+2. It specifies that the first row in the csv file contains "header" information i.e. column names
+3. It specifies that neighbouring columns are separated by a comma ","
+4. It says not to convert charachter strings (i.e. text) to something called a factor
+
+How would we find this out if we didn't know already? Look at the help file:
+```{r eval=FALSE}
+?read.csv
 ```
-CSV
-TXT
-XLSX
-SPSS
-SAS
-STATA
+
+Comma Separated Value (.csv) files are usually the standard, simplest format which is compatible with all sort of different software, e.g. R, python, Excel, MATLAB, ...
+
+But if we needed to read in a different format of data, there's usually a function or a library for doing just that,
+
+e.g.
+in base R:
+
+- `read.csv()`
+- `read.table()`
+
+In the package "xlsx":
+
+- `read.xlsx()`
+
+In the package "foreign":
+
+- `read.dta()` for STATA (version 5-12) data files 
+- `read.spss()` for SPSS files
+
+How can we examine this data set now that we've loaded it?
+
+
+
+### Viewing The Data
+Use the function `View()` to visually look at the data
+
+```{r eval=FALSE}
+View(gambling.data)
+```
+
+### Changing The Column Names
+Using the background information on the dataset, change the column names so they make sense.
+
+
+```{r changeNames}
+class(gambling.data)
+
+names(gambling.data) <- c("Month.Year",
+                 "Local.Govt.Area",
+                 "Approved.Sites",
+                 "Operational.Sites",
+                 "Approved.EGMs", 
+                 "Operational.EGMs", 
+                 "Player.Money.Lost")
+```
+
+Afterwards, view the data again to check the column names have been changed.
+
+```{r eval=FALSE}
+View(gambling.data)
+```
+
+
+
+### Accessing Subsets
+Return only the first 10 rows of the data set
+```{r}
+gambling.data[1:10,]
+head(gambling.data,10)
+```
+Return the last ten rows in a data set
+```{r}
+gambling.data[nrow(gambling.data)+(-9:0),]
+tail(gambling.data,10)
+```
+
+
+
+Return only the period column in the data set (wrapped in head() to avoid a really long output)
+```{r}
+head(gambling.data[,3],50)
+```
+
+Return only the first 5 rows and columns 4 through 7 of the data set
+```{r}
+gambling.data[1:5, 4:7]
+```
+
+Return the column named "Player.Money.Lost"
+```{r}
+head(gambling.data[,"Player.Money.Lost"],50) 
+```
+
+Return the column named "Player.Money.Lost"
+```{r}
+head(gambling.data$Player.Money.Lost, n=50)
+```
+
+Return the columns named "Local.Govt.Area" and "Player.Money.Lost"
+```{r}
+head(gambling.data[,c("Local.Govt.Area","Player.Money.Lost")],30)
+```
+
+### Summarising The Data
+Use the summary function to return a quick summary
+
+```{r}
+summary(gambling.data)
+```
+
+Use the summary function to return a quick summary of only the third column
+
+```{r}
+summary(gambling.data[,3])
+```
+
+### Data Types
+Check the data class of the third column
+Convert the third column to factor using the factor() function
+Use the summary function to return a quick summary of only the third column, what changed?
+
+```{r}
+class(gambling.data[,3])
+
+gambling.data[,3] <- factor(gambling.data[,3])
+
+summary(gambling.data[,3])
+
+```
+
+### Creating Vectors
+Create a vector called "vector" with the information from the first record
+
+```{r}
+vector <- gambling.data[1,]
+```
+
+### Adding records
+Add vector to the data set using the rbind() function
+Add a new column called "source" to the data set, where each record is "Wankarani Settlement Dataset"
+Add a new column called "author" to the data set, where each record is "Timothy L. McAndrews"
+
+```{r}
+gambling.data[136,] <- vector
+gambling.data$source <- "Wankarani Settlement dataset"
+gambling.data$author <- "Timothy L. McAndrews"
+```
+
+
+### Writing Data
+Use the write.table() function to make the datafile a text file
+
+```{r}
+write.table(x = gambling.data,
+            file = "gamblingData.txt",
+            row.names = FALSE,
+            col.names = TRUE,
+            sep = ",")
+```
+
+Use the write.csv() function to make the datafile a csv (comma separated values) file
+
+```{r}
+write.csv(x = gambling.data,
+          file = "gamblingData.csv",
+          row.names = FALSE,
+          col.names = TRUE,
+          sep = ",")
+```
+
+          
+Use the write.xlsx
