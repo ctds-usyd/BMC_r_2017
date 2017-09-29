@@ -165,7 +165,8 @@ tail(simple.data,2)
 ```
 Return a random two rows from the data set
 ```{r}
-sample_n(simple.data,2)
+
+dplyr::sample_n(simple.data,2)
 ```
 
 
@@ -175,7 +176,7 @@ simple.data[,4]
 simple.data[,"favourite.letter"]
 simple.data[,c("favourite.letter")]
 simple.data[,names(simple.data) %in% c("favourite.letter")]
-simple.data$favourite.letters
+simple.data$favourite.letter
 ```
 
 Return only the first 3 rows and columns 2 and 5 of the data set
