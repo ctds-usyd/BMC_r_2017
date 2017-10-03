@@ -22,6 +22,18 @@ Welcome to the home page for the Brain & Mind Centre R course. It is a three day
 
 These courses are designed to be informal and free flowing, so whilst there is some material we have prepared, if you have a question then at anytime please let us know and we will be more than happy to assist. If there is anything that we can't answer on the day, we will note it down and make sure that we get back to you with a thorough solution.
 
+## About R
+
+### The R Programming Language
+
+[R](https://www.r-project.org/) is an open source programming language and software environment for statistical computing and graphics that is supported by the R Foundation for Statistical Computing. Today, it is one of the most popular languages, being used all across the world in a wide variety of domains and fields.
+
+### RStudio
+
+[RStudio](https://www.rstudio.com/) is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.
+
+![Example RStudio Screen](ExampleRstudioScreen.jpg)
+
 ### Installation & Setup
 
 Below is a script that installs packages that you will need for the next three days and also sets some options which will make the course run smoothly. We will explain what the script does as we get further into the material, but for the meantime we would ask that you copy the script and run it in your environment.
@@ -44,15 +56,7 @@ options(scipen = 999)
 set.seed(5)
 ```
 
-## About R
 
-### The R Programming Language
-
-[R](https://www.r-project.org/) is an open source programming language and software environment for statistical computing and graphics that is supported by the R Foundation for Statistical Computing. Today, it is one of the most popular languages, being used all across the world in a wide variety of domains and fields.
-
-### RStudio
-
-[RStudio](https://www.rstudio.com/) is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.
 
 ## Getting Started
 
