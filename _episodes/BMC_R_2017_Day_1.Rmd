@@ -560,7 +560,7 @@ simple.data<-rbind(simple.data,new.person)
 ```
 
 
-### Writing Data
+## Writing Data
 Use the write.table() function to make the datafile a text file
 
 ```{r}
