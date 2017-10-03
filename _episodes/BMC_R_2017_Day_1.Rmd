@@ -32,7 +32,7 @@ These courses are designed to be informal and free flowing, so whilst there is s
 
 [RStudio](https://www.rstudio.com/) is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.
 
-![Example RStudio Screen](ExampleRstudioScreen.jpg)
+![Example RStudio Screenshot](ExampleRstudioScreen.jpg)
 
 ### Installation & Setup
 
