@@ -156,12 +156,14 @@ Return only the first 3 rows of the data set
 ```{r}
 simple.data[1:3,]
 simple.data[c(1,2,3),]
+simple.data[c(TRUE,TRUE,TRUE,FALSE),]
 head(simple.data,3)
 ```
 Return the last two rows in a data set
 ```{r}
 simple.data[nrow(simple.data)+(-1:0),]
 tail(simple.data,2)
+simple.data[c(FALSE,FALSE,TRUE,TRUE),]
 ```
 Return a random two rows from the data set
 ```{r}
@@ -175,6 +177,7 @@ Return only the "favourite.letter" column in the data set
 simple.data[,4]
 simple.data[,"favourite.letter"]
 simple.data[,c("favourite.letter")]
+simple.data[,c(F,F,F,T,F,F,F)]
 simple.data[,names(simple.data) %in% c("favourite.letter")]
 simple.data$favourite.letter
 ```
@@ -189,7 +192,44 @@ Return the columns named "first.name" and "favourite.number"
 simple.data[,c("first.name","favourite.number")]
 ```
 
-### Subsetting the data
+### Filtering the data
+
+Return only the rows (people) which are Female
+```{r}
+simple.data[simple.data$gender=="Female",]
+```
+What exactly happened here?
+
+We made a vector of `TRUE/FALSE` statements, for each row in which this condition is true:
+```{r}
+indexes<-simple.data$gender=="Female"
+indexes
+```
+then we subset rows in which the index is true
+
+```{r}
+simple.data[indexes,]
+```
+
+What if we want all of the people whose favourite number is larger than 10?
+
+```{r}
+simple.data[simple.data$favourite.number>10,]
+```
+What if we want just the name all of the people whose favourite number is larger than 10?
+
+```{r}
+simple.data[simple.data$favourite.number>10,"first.name"]
+```
+We could have also done
+
+```{r}
+simple.data$first.name[simple.data$favourite.number>10]
+```
+
+Quiz: 
+1. How to extract Alice's favourite number?
+2. Daniel's favourite weekday?
 
 ## More Realistic Data
 
@@ -267,15 +307,11 @@ Using the background information on the dataset, change the column names so they
 
 
 ```{r changeNames}
-class(gambling.data)
+names(gambling.data)
 
-names(gambling.data) <- c("Month.Year",
-                 "Local.Govt.Area",
-                 "Approved.Sites",
-                 "Operational.Sites",
-                 "Approved.EGMs", 
-                 "Operational.EGMs", 
-                 "Player.Money.Lost")
+names(gambling.data)[2] <- "Local.Govt.Area"
+
+names(gambling.data)[7] <- "Player.Money.Lost"
 ```
 
 Afterwards, view the data again to check the column names have been changed.
@@ -284,90 +320,243 @@ Afterwards, view the data again to check the column names have been changed.
 View(gambling.data)
 ```
 
+### Add a new Date column
+Time to add in a column which has the date as a date-time object instead of as a character string. We will need to use several functions to do this. 
 
+The first function we will need is `paste0()`. This function concatenates strings. For example;
+```{r}
+paste0("Wo","rd")
+```
+
+The second function we will need is `strptime()`
+
+Use the help function to find out what it does: `?strptime`
+
+Now let's convert the character string which we have describing the month and year of each row of data, into a date-time object so that it will be ordered appropriately etc.
+
+```{r}
+#Add a day of month (1st) to each date string
+date.string <- paste0( "1 " , gambling.data$Month.Year )
+
+#Convert to POSIXlt, a date-time format
+strptime( date.string , format = "%d %B %Y" ) -> gambling.data$Date
+```
+
+Afterwards, view the data again to check the new "Date" column.
+
+```{r eval=FALSE}
+View(gambling.data)
+```
 
 ### Accessing Subsets
-Return only the first 10 rows of the data set
+Let's look at all the records for Brisbane:
 ```{r}
-gambling.data[1:10,]
-head(gambling.data,10)
-```
-Return the last ten rows in a data set
-```{r}
-gambling.data[nrow(gambling.data)+(-9:0),]
-tail(gambling.data,10)
+brisbane.only<-gambling.data[gambling.data$Local.Govt.Area=="BRISBANE",]
 ```
 
-
-
-Return only the period column in the data set (wrapped in head() to avoid a really long output)
+What is the average amount of money lost by players in any given month in Brisbane?
 ```{r}
-head(gambling.data[,3],50)
+mean(brisbane.only$Player.Money.Lost)
+```
+That's a lot of money!
+
+What is the largest amount of money lost by players in any given month in Brisbane?
+```{r}
+max(brisbane.only$Player.Money.Lost)
 ```
 
-Return only the first 5 rows and columns 4 through 7 of the data set
+What month was this?
 ```{r}
-gambling.data[1:5, 4:7]
+brisbane.only$Month.Year[which.max(brisbane.only$Player.Money.Lost)]
 ```
 
-Return the column named "Player.Money.Lost"
+
+What if we want the rows from brisbane which happen in 2010?
 ```{r}
-head(gambling.data[,"Player.Money.Lost"],50) 
+row.indicies<-(brisbane.only$Date>="2010-01-01 AEST" &
+                 brisbane.only$Date<="2010-12-31 AEST")
+
+(brisbane.2010.data<-brisbane.only[row.indicies,])
+
 ```
 
-Return the column named "Player.Money.Lost"
-```{r}
-head(gambling.data$Player.Money.Lost, n=50)
-```
-
-Return the columns named "Local.Govt.Area" and "Player.Money.Lost"
-```{r}
-head(gambling.data[,c("Local.Govt.Area","Player.Money.Lost")],30)
-```
+On the last line we used a shortcut; if you want to assign a variable with `<-` but also print it, you can put the whole expression in parentheses.
 
 ### Summarising The Data
 Use the summary function to return a quick summary
 
 ```{r}
 summary(gambling.data)
+summary(brisbane.only)
+summary(brisbane.2010.data)
 ```
 
-Use the summary function to return a quick summary of only the third column
+Use the summary function to return a quick summary of only the money column
 
 ```{r}
-summary(gambling.data[,3])
+summary(brisbane.2010.data$Player.Money.Lost)
 ```
 
-### Data Types
-Check the data class of the third column
-Convert the third column to factor using the factor() function
-Use the summary function to return a quick summary of only the third column, what changed?
+Get a random selection of data and look at which Local government areas are included
 
 ```{r}
-class(gambling.data[,3])
+random.fifty.rows<-dplyr::sample_n(gambling.data,50)
 
-gambling.data[,3] <- factor(gambling.data[,3])
+#look at each row's Local Government Area (LGA)
+random.fifty.rows$Local.Govt.Area
 
-summary(gambling.data[,3])
+#look at the unique local government areas (duplicates removed)
+unique(random.fifty.rows$Local.Govt.Area)
 
+#look at how many rows there are for each LGA
+table(random.fifty.rows$Local.Govt.Area)
 ```
 
-### Creating Vectors
-Create a vector called "vector" with the information from the first record
+Challenge: find which Local government area had the lowest non-zero amount of money lost in a month.
+
+## Data Types
+
+There are several different types of data you can use in R, and you can even make your own new *types* (but we won't touch on that today). Now we will examine a few common ones in a little more detail.
+
+### Strings
+
+Character strings are known as "character" in R:
 
 ```{r}
-vector <- gambling.data[1,]
+gambling.data$Local.Govt.Area[3]
+
+class(gambling.data$Local.Govt.Area)
 ```
+
+### Numbers
+
+Numbers have different classes, they can be integer:
+
+```{r}
+gambling.data$Operational.EGMs[36]
+
+class(gambling.data$Operational.EGMs)
+```
+
+They can be numeric:
+
+```{r}
+gambling.data$Player.Money.Lost[84]
+
+class(gambling.data$Player.Money.Lost)
+
+class(0.1)
+
+class(pi)
+```
+They can be complex:
+
+```{r}
+class(1i+3)
+```
+
+They can be double:
+
+```{r}
+x<-as.double(3.345678987654323456789)
+```
+
+They can have rounding errors
+```{r}
+x-(x-0.0000000000001)
+```
+
+### Logical (True/False)
+
+```{r}
+class(TRUE)
+class(1==1)
+```
+
+### Factor
+
+A factor is a string label on top of an integer index
+
+```{r}
+as.factor("I am a label")
+```
+
+This makes most sense in the context of a survey response, e.g. 1=Good, 2, 3=Average, 4, 5=Bad; or something like that. For example in the simple data we had at the beginning, gender is a factor.
+
+```{r}
+class(simple.data$gender)
+simple.data$gender
+as.numeric(simple.data$gender)
+table(simple.data$gender)
+```
+
+
+### Vectors and Lists
+Vectors are all of the same class
+
+
+```{r}
+#a vector
+c("a","b","c")
+
+#another vector
+c(1,4,7)
+```
+
+If you try to put different classes of things into a vector it will try to convert them to the same class.
+
+```{r}
+#this will be converted to a vector of character strings
+(what.am.I<-c("a",2,"c",FALSE,c(1,2,3)))
+class(what.am.I)
+```
+
+Lists can contain different classes of things in each element, possibly of different lengths
+```{r}
+#a list
+list("a",2,"c",FALSE,c(1,2,3))
+```
+
+### Data frames
+
+Data frames are really a list of vectors of equal length, and they function like a table of data. We made one right at the beginning:
+
+```{r eval=FALSE}
+simple.data<-data.frame(first.name=c("Alice",
+                                     "Bob",
+                                     "Cathy",
+                                     "Daniel"),
+                        gender=as.factor(c("Female",
+                                           "Male",
+                                           "Female",
+                                           "Male")),
+                        favourite.number=c(4,23,pi,exp(1)),
+                        favourite.letter=c("a","c","x","q"),
+                        favourite.weekday=c("Monday","Thursday","Sunday","Friday"),
+                        stringsAsFactors = FALSE)
+```
+
+- We made a column called "first.name", a vector of character strings (favourite.letter and favourite.weekday are also character strings)
+
+- We made a column called "gender", a vector of factors
+
+- We made a column called "favourite.number", a vector of class numeric
+
+- Lastly we told it to not convert all the character string colums into factors (which is something it does by default) by adding the optional argument `stringsAsFactors = FALSE` to the `data.frame()` function.
 
 ### Adding records
-Add vector to the data set using the rbind() function
-Add a new column called "source" to the data set, where each record is "Wankarani Settlement Dataset"
-Add a new column called "author" to the data set, where each record is "Timothy L. McAndrews"
+Add a new row to the data set using the rbind() function:
 
-```{r}
-gambling.data[136,] <- vector
-gambling.data$source <- "Wankarani Settlement dataset"
-gambling.data$author <- "Timothy L. McAndrews"
+```{r eval=FALSE}
+new.person <- data.frame(first.name="Evelyn",
+                        gender="Female",
+                        favourite.number=12,
+                        favourite.letter="z",
+                        favourite.weekday="Monday",
+                        stringsAsFactors = FALSE)
+
+simple.data<-rbind(simple.data,new.person)
+
 ```
 
 
@@ -375,8 +564,8 @@ gambling.data$author <- "Timothy L. McAndrews"
 Use the write.table() function to make the datafile a text file
 
 ```{r}
-write.table(x = gambling.data,
-            file = "gamblingData.txt",
+write.table(x = simple.data,
+            file = "simpleData.txt",
             row.names = FALSE,
             col.names = TRUE,
             sep = ",")
@@ -385,11 +574,9 @@ write.table(x = gambling.data,
 Use the write.csv() function to make the datafile a csv (comma separated values) file
 
 ```{r}
-write.csv(x = gambling.data,
-          file = "gamblingData.csv",
-          row.names = FALSE,
-          col.names = TRUE,
-          sep = ",")
+write.csv(x = simple.data,
+          file = "simpleData.csv",
+          row.names = FALSE)
 ```
 
           

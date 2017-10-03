@@ -352,6 +352,11 @@ some.fruits</code></pre>
 ## 1      Alice Female         4.000000                a            Monday
 ## 2        Bob   Male        23.000000                c          Thursday
 ## 3      Cathy Female         3.141593                x            Sunday</code></pre>
+<pre class="r"><code>simple.data[c(TRUE,TRUE,TRUE,FALSE),]</code></pre>
+<pre><code>##   first.name gender favourite.number favourite.letter favourite.weekday
+## 1      Alice Female         4.000000                a            Monday
+## 2        Bob   Male        23.000000                c          Thursday
+## 3      Cathy Female         3.141593                x            Sunday</code></pre>
 <pre class="r"><code>head(simple.data,3)</code></pre>
 <pre><code>##   first.name gender favourite.number favourite.letter favourite.weekday
 ## 1      Alice Female         4.000000                a            Monday
@@ -366,17 +371,23 @@ some.fruits</code></pre>
 <pre><code>##   first.name gender favourite.number favourite.letter favourite.weekday
 ## 3      Cathy Female         3.141593                x            Sunday
 ## 4     Daniel   Male         2.718282                q            Friday</code></pre>
+<pre class="r"><code>simple.data[c(FALSE,FALSE,TRUE,TRUE),]</code></pre>
+<pre><code>##   first.name gender favourite.number favourite.letter favourite.weekday
+## 3      Cathy Female         3.141593                x            Sunday
+## 4     Daniel   Male         2.718282                q            Friday</code></pre>
 <p>Return a random two rows from the data set</p>
 <pre class="r"><code>dplyr::sample_n(simple.data,2)</code></pre>
 <pre><code>##   first.name gender favourite.number favourite.letter favourite.weekday
-## 4     Daniel   Male         2.718282                q            Friday
-## 1      Alice Female         4.000000                a            Monday</code></pre>
+## 1      Alice Female         4.000000                a            Monday
+## 3      Cathy Female         3.141593                x            Sunday</code></pre>
 <p>Return only the “favourite.letter” column in the data set</p>
 <pre class="r"><code>simple.data[,4]</code></pre>
 <pre><code>## [1] &quot;a&quot; &quot;c&quot; &quot;x&quot; &quot;q&quot;</code></pre>
 <pre class="r"><code>simple.data[,&quot;favourite.letter&quot;]</code></pre>
 <pre><code>## [1] &quot;a&quot; &quot;c&quot; &quot;x&quot; &quot;q&quot;</code></pre>
 <pre class="r"><code>simple.data[,c(&quot;favourite.letter&quot;)]</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;c&quot; &quot;x&quot; &quot;q&quot;</code></pre>
+<pre class="r"><code>simple.data[,c(F,F,F,T,F,F,F)]</code></pre>
 <pre><code>## [1] &quot;a&quot; &quot;c&quot; &quot;x&quot; &quot;q&quot;</code></pre>
 <pre class="r"><code>simple.data[,names(simple.data) %in% c(&quot;favourite.letter&quot;)]</code></pre>
 <pre><code>## [1] &quot;a&quot; &quot;c&quot; &quot;x&quot; &quot;q&quot;</code></pre>
@@ -396,8 +407,34 @@ some.fruits</code></pre>
 ## 3      Cathy         3.141593
 ## 4     Daniel         2.718282</code></pre>
 </div>
-<div id="subsetting-the-data" class="section level3">
-<h3>Subsetting the data</h3>
+<div id="filtering-the-data" class="section level3">
+<h3>Filtering the data</h3>
+<p>Return only the rows (people) which are Female</p>
+<pre class="r"><code>simple.data[simple.data$gender==&quot;Female&quot;,]</code></pre>
+<pre><code>##   first.name gender favourite.number favourite.letter favourite.weekday
+## 1      Alice Female         4.000000                a            Monday
+## 3      Cathy Female         3.141593                x            Sunday</code></pre>
+<p>What exactly happened here?</p>
+<p>We made a vector of <code>TRUE/FALSE</code> statements, for each row in which this condition is true:</p>
+<pre class="r"><code>indexes&lt;-simple.data$gender==&quot;Female&quot;
+indexes</code></pre>
+<pre><code>## [1]  TRUE FALSE  TRUE FALSE</code></pre>
+<p>then we subset rows in which the index is true</p>
+<pre class="r"><code>simple.data[indexes,]</code></pre>
+<pre><code>##   first.name gender favourite.number favourite.letter favourite.weekday
+## 1      Alice Female         4.000000                a            Monday
+## 3      Cathy Female         3.141593                x            Sunday</code></pre>
+<p>What if we want all of the people whose favourite number is larger than 10?</p>
+<pre class="r"><code>simple.data[simple.data$favourite.number&gt;10,]</code></pre>
+<pre><code>##   first.name gender favourite.number favourite.letter favourite.weekday
+## 2        Bob   Male               23                c          Thursday</code></pre>
+<p>What if we want just the name all of the people whose favourite number is larger than 10?</p>
+<pre class="r"><code>simple.data[simple.data$favourite.number&gt;10,&quot;first.name&quot;]</code></pre>
+<pre><code>## [1] &quot;Bob&quot;</code></pre>
+<p>We could have also done</p>
+<pre class="r"><code>simple.data$first.name[simple.data$favourite.number&gt;10]</code></pre>
+<pre><code>## [1] &quot;Bob&quot;</code></pre>
+<p>Quiz: 1. How to extract Alice’s favourite number? 2. Daniel’s favourite weekday?</p>
 </div>
 </div>
 <div id="more-realistic-data" class="section level2">
@@ -494,182 +531,79 @@ some.fruits</code></pre>
 <div id="changing-the-column-names" class="section level3">
 <h3>Changing The Column Names</h3>
 <p>Using the background information on the dataset, change the column names so they make sense.</p>
-<pre class="r"><code>class(gambling.data)</code></pre>
-<pre><code>## [1] &quot;data.frame&quot;</code></pre>
-<pre class="r"><code>names(gambling.data) &lt;- c(&quot;Month.Year&quot;,
-                 &quot;Local.Govt.Area&quot;,
-                 &quot;Approved.Sites&quot;,
-                 &quot;Operational.Sites&quot;,
-                 &quot;Approved.EGMs&quot;, 
-                 &quot;Operational.EGMs&quot;, 
-                 &quot;Player.Money.Lost&quot;)</code></pre>
+<pre class="r"><code>names(gambling.data)</code></pre>
+<pre><code>## [1] &quot;Month.Year&quot;        &quot;LGA.Region&quot;        &quot;Approved.Sites&quot;   
+## [4] &quot;Operational.Sites&quot; &quot;Approved.EGMs&quot;     &quot;Operational.EGMs&quot; 
+## [7] &quot;Metered.Win&quot;</code></pre>
+<pre class="r"><code>names(gambling.data)[2] &lt;- &quot;Local.Govt.Area&quot;
+
+names(gambling.data)[7] &lt;- &quot;Player.Money.Lost&quot;</code></pre>
 <p>Afterwards, view the data again to check the column names have been changed.</p>
+<pre class="r"><code>View(gambling.data)</code></pre>
+</div>
+<div id="add-a-new-date-column" class="section level3">
+<h3>Add a new Date column</h3>
+<p>Time to add in a column which has the date as a date-time object instead of as a character string. We will need to use several functions to do this.</p>
+<p>The first function we will need is <code>paste0()</code>. This function concatenates strings. For example;</p>
+<pre class="r"><code>paste0(&quot;Wo&quot;,&quot;rd&quot;)</code></pre>
+<pre><code>## [1] &quot;Word&quot;</code></pre>
+<p>The second function we will need is <code>strptime()</code></p>
+<p>Use the help function to find out what it does: <code>?strptime</code></p>
+<p>Now let’s convert the character string which we have describing the month and year of each row of data, into a date-time object so that it will be ordered appropriately etc.</p>
+<pre class="r"><code>#Add a day of month (1st) to each date string
+date.string &lt;- paste0( &quot;1 &quot; , gambling.data$Month.Year )
+
+#Convert to POSIXlt, a date-time format
+strptime( date.string , format = &quot;%d %B %Y&quot; ) -&gt; gambling.data$Date</code></pre>
+<p>Afterwards, view the data again to check the new “Date” column.</p>
 <pre class="r"><code>View(gambling.data)</code></pre>
 </div>
 <div id="accessing-subsets-1" class="section level3">
 <h3>Accessing Subsets</h3>
-<p>Return only the first 10 rows of the data set</p>
-<pre class="r"><code>gambling.data[1:10,]</code></pre>
-<pre><code>##    Month.Year Local.Govt.Area Approved.Sites Operational.Sites
-## 1   July 2004         BALONNE              7                 6
-## 2   July 2004          BANANA             11                11
-## 3   July 2004      BARCALDINE              3                 3
-## 4   July 2004  BLACKALL TAMBO              3                 3
-## 5   July 2004        BRISBANE            242               230
-## 6   July 2004       BUNDABERG             43                42
-## 7   July 2004        BURDEKIN              8                 8
-## 8   July 2004          CAIRNS             44                44
-## 9   July 2004     CARPENTARIA              2                 2
-## 10  July 2004 CASSOWARY COAST             17                16
-##    Approved.EGMs Operational.EGMs Player.Money.Lost
-## 1             74               74          139309.6
-## 2            183              183          296541.8
-## 3             28               28                NA
-## 4             26               26                NA
-## 5           8801             8370        32591123.0
-## 6           1014              968         3468944.7
-## 7            185              169          440256.8
-## 8           1536             1497         4698889.2
-## 9             36               36                NA
-## 10           344              324          901792.7</code></pre>
-<pre class="r"><code>head(gambling.data,10)</code></pre>
-<pre><code>##    Month.Year Local.Govt.Area Approved.Sites Operational.Sites
-## 1   July 2004         BALONNE              7                 6
-## 2   July 2004          BANANA             11                11
-## 3   July 2004      BARCALDINE              3                 3
-## 4   July 2004  BLACKALL TAMBO              3                 3
-## 5   July 2004        BRISBANE            242               230
-## 6   July 2004       BUNDABERG             43                42
-## 7   July 2004        BURDEKIN              8                 8
-## 8   July 2004          CAIRNS             44                44
-## 9   July 2004     CARPENTARIA              2                 2
-## 10  July 2004 CASSOWARY COAST             17                16
-##    Approved.EGMs Operational.EGMs Player.Money.Lost
-## 1             74               74          139309.6
-## 2            183              183          296541.8
-## 3             28               28                NA
-## 4             26               26                NA
-## 5           8801             8370        32591123.0
-## 6           1014              968         3468944.7
-## 7            185              169          440256.8
-## 8           1536             1497         4698889.2
-## 9             36               36                NA
-## 10           344              324          901792.7</code></pre>
-<p>Return the last ten rows in a data set</p>
-<pre class="r"><code>gambling.data[nrow(gambling.data)+(-9:0),]</code></pre>
-<pre><code>##      Month.Year Local.Govt.Area Approved.Sites Operational.Sites
-## 8626  July 2017  SOUTHERN DOWNS             13                13
-## 8627  July 2017  SUNSHINE COAST             69                69
-## 8628  July 2017      TABLELANDS              5                 5
-## 8629  July 2017       TOOWOOMBA             54                47
-## 8630  July 2017          TORRES              5                 5
-## 8631  July 2017      TOWNSVILLE             44                38
-## 8632  July 2017           WEIPA              3                 3
-## 8633  July 2017   WESTERN DOWNS             24                22
-## 8634  July 2017      WHITSUNDAY             18                16
-## 8635  July 2017          WINTON              3                 3
-##      Approved.EGMs Operational.EGMs Player.Money.Lost
-## 8626           356              353         1087520.2
-## 8627          2964             2923        13526392.8
-## 8628           155              148          634529.6
-## 8629          1654             1490         6410026.2
-## 8630           140               93          513079.5
-## 8631          1920             1698         9123216.3
-## 8632            76               74                NA
-## 8633           377              323         1235764.0
-## 8634           514              417         2185924.4
-## 8635            17               13                NA</code></pre>
-<pre class="r"><code>tail(gambling.data,10)</code></pre>
-<pre><code>##      Month.Year Local.Govt.Area Approved.Sites Operational.Sites
-## 8626  July 2017  SOUTHERN DOWNS             13                13
-## 8627  July 2017  SUNSHINE COAST             69                69
-## 8628  July 2017      TABLELANDS              5                 5
-## 8629  July 2017       TOOWOOMBA             54                47
-## 8630  July 2017          TORRES              5                 5
-## 8631  July 2017      TOWNSVILLE             44                38
-## 8632  July 2017           WEIPA              3                 3
-## 8633  July 2017   WESTERN DOWNS             24                22
-## 8634  July 2017      WHITSUNDAY             18                16
-## 8635  July 2017          WINTON              3                 3
-##      Approved.EGMs Operational.EGMs Player.Money.Lost
-## 8626           356              353         1087520.2
-## 8627          2964             2923        13526392.8
-## 8628           155              148          634529.6
-## 8629          1654             1490         6410026.2
-## 8630           140               93          513079.5
-## 8631          1920             1698         9123216.3
-## 8632            76               74                NA
-## 8633           377              323         1235764.0
-## 8634           514              417         2185924.4
-## 8635            17               13                NA</code></pre>
-<p>Return only the period column in the data set (wrapped in head() to avoid a really long output)</p>
-<pre class="r"><code>head(gambling.data[,3],50)</code></pre>
-<pre><code>##  [1]   7  11   3   3 242  43   8  44   2  17  20  10   6   3  11   3  40
-## [18]  23 131  11  23   8  41  17  13  19  41   6  47   8   7   2  63   9
-## [35]   8  20  11   2   1  28   2  43  21  13  21  23  75   7  59   4</code></pre>
-<p>Return only the first 5 rows and columns 4 through 7 of the data set</p>
-<pre class="r"><code>gambling.data[1:5, 4:7]</code></pre>
-<pre><code>##   Operational.Sites Approved.EGMs Operational.EGMs Player.Money.Lost
-## 1                 6            74               74          139309.6
-## 2                11           183              183          296541.8
-## 3                 3            28               28                NA
-## 4                 3            26               26                NA
-## 5               230          8801             8370        32591123.0</code></pre>
-<p>Return the column named “Player.Money.Lost”</p>
-<pre class="r"><code>head(gambling.data[,&quot;Player.Money.Lost&quot;],50) </code></pre>
-<pre><code>##  [1]   139309.6   296541.8         NA         NA 32591123.0  3468944.7
-##  [7]   440256.8  4698889.2         NA   901792.7  1141868.5   328243.4
-## [13]   176176.4         NA   482907.8         NA  3927990.4  1998615.2
-## [19] 21997380.2   384871.0  1033524.7   250468.0  5272361.5   658395.8
-## [25]   759295.4   767601.5 10080496.9   123490.2  3952990.1   232043.1
-## [31]   483970.4         NA 11937794.4  1467412.2   154319.4  2122100.6
-## [37]   291640.8         NA         NA  4587508.6         NA  3022143.5
-## [43]   564725.0   454375.7   932353.5   881368.8  9415415.3   338596.4
-## [49]  4278594.5         NA</code></pre>
-<p>Return the column named “Player.Money.Lost”</p>
-<pre class="r"><code>head(gambling.data$Player.Money.Lost, n=50)</code></pre>
-<pre><code>##  [1]   139309.6   296541.8         NA         NA 32591123.0  3468944.7
-##  [7]   440256.8  4698889.2         NA   901792.7  1141868.5   328243.4
-## [13]   176176.4         NA   482907.8         NA  3927990.4  1998615.2
-## [19] 21997380.2   384871.0  1033524.7   250468.0  5272361.5   658395.8
-## [25]   759295.4   767601.5 10080496.9   123490.2  3952990.1   232043.1
-## [31]   483970.4         NA 11937794.4  1467412.2   154319.4  2122100.6
-## [37]   291640.8         NA         NA  4587508.6         NA  3022143.5
-## [43]   564725.0   454375.7   932353.5   881368.8  9415415.3   338596.4
-## [49]  4278594.5         NA</code></pre>
-<p>Return the columns named “Local.Govt.Area” and “Player.Money.Lost”</p>
-<pre class="r"><code>head(gambling.data[,c(&quot;Local.Govt.Area&quot;,&quot;Player.Money.Lost&quot;)],30)</code></pre>
-<pre><code>##      Local.Govt.Area Player.Money.Lost
-## 1            BALONNE          139309.6
-## 2             BANANA          296541.8
-## 3         BARCALDINE                NA
-## 4     BLACKALL TAMBO                NA
-## 5           BRISBANE        32591123.0
-## 6          BUNDABERG         3468944.7
-## 7           BURDEKIN          440256.8
-## 8             CAIRNS         4698889.2
-## 9        CARPENTARIA                NA
-## 10   CASSOWARY COAST          901792.7
-## 11 CENTRAL HIGHLANDS         1141868.5
-## 12   CHARTERS TOWERS          328243.4
-## 13         CLONCURRY          176176.4
-## 14              COOK                NA
-## 15           DOUGLAS          482907.8
-## 16          FLINDERS                NA
-## 17      FRASER COAST         3927990.4
-## 18         GLADSTONE         1998615.2
-## 19        GOLD COAST        21997380.2
-## 20       GOONDIWINDI          384871.0
-## 21            GYMPIE         1033524.7
-## 22      HINCHINBROOK          250468.0
-## 23           IPSWICH         5272361.5
-## 24             ISAAC          658395.8
-## 25       LIVINGSTONE          759295.4
-## 26    LOCKYER VALLEY          767601.5
-## 27             LOGAN        10080496.9
-## 28         LONGREACH          123490.2
-## 29            MACKAY         3952990.1
-## 30           MARANOA          232043.1</code></pre>
+<p>Let’s look at all the records for Brisbane:</p>
+<pre class="r"><code>brisbane.only&lt;-gambling.data[gambling.data$Local.Govt.Area==&quot;BRISBANE&quot;,]</code></pre>
+<p>What is the average amount of money lost by players in any given month in Brisbane?</p>
+<pre class="r"><code>mean(brisbane.only$Player.Money.Lost)</code></pre>
+<pre><code>## [1] 35825434</code></pre>
+<p>That’s a lot of money!</p>
+<p>What is the largest amount of money lost by players in any given month in Brisbane?</p>
+<pre class="r"><code>max(brisbane.only$Player.Money.Lost)</code></pre>
+<pre><code>## [1] 47092687</code></pre>
+<p>What month was this?</p>
+<pre class="r"><code>brisbane.only$Month.Year[which.max(brisbane.only$Player.Money.Lost)]</code></pre>
+<pre><code>## [1] &quot;July 2017&quot;</code></pre>
+<p>What if we want the rows from brisbane which happen in 2010?</p>
+<pre class="r"><code>row.indicies&lt;-(brisbane.only$Date&gt;=&quot;2010-01-01 AEST&quot; &amp;
+                 brisbane.only$Date&lt;=&quot;2010-12-31 AEST&quot;)
+
+(brisbane.2010.data&lt;-brisbane.only[row.indicies,])</code></pre>
+<pre><code>##          Month.Year Local.Govt.Area Approved.Sites Operational.Sites
+## 3635   January 2010        BRISBANE            227               220
+## 3690  February 2010        BRISBANE            227               220
+## 3745     March 2010        BRISBANE            227               220
+## 3800     April 2010        BRISBANE            227               221
+## 3855       May 2010        BRISBANE            228               222
+## 3910      June 2010        BRISBANE            227               222
+## 3965      July 2010        BRISBANE            226               219
+## 4020    August 2010        BRISBANE            226               218
+## 4075 September 2010        BRISBANE            225               218
+## 4130   October 2010        BRISBANE            225               218
+## 4185  November 2010        BRISBANE            225               218
+## 4240  December 2010        BRISBANE            225               217
+##      Approved.EGMs Operational.EGMs Player.Money.Lost       Date
+## 3635          9183             8834          31268720 2010-01-01
+## 3690          9175             8854          30025451 2010-02-01
+## 3745          9225             8859          32183381 2010-03-01
+## 3800          9345             8956          32017037 2010-04-01
+## 3855          9230             8815          32244843 2010-05-01
+## 3910          9166             8872          31873072 2010-06-01
+## 3965          9144             8809          36225638 2010-07-01
+## 4020          9119             8791          36861039 2010-08-01
+## 4075          9106             8812          34763792 2010-09-01
+## 4130          9106             8799          36211785 2010-10-01
+## 4185          9126             8830          33534227 2010-11-01
+## 4240          9126             8797          35019142 2010-12-01</code></pre>
+<p>On the last line we used a shortcut; if you want to assign a variable with <code>&lt;-</code> but also print it, you can put the whole expression in parentheses.</p>
 </div>
 <div id="summarising-the-data" class="section level3">
 <h3>Summarising The Data</h3>
@@ -690,75 +624,263 @@ some.fruits</code></pre>
 ##  Mean   : 796   Mean   : 762.5   Mean   : 3773709  
 ##  3rd Qu.:1027   3rd Qu.: 979.0   3rd Qu.: 4458886  
 ##  Max.   :9345   Max.   :8970.0   Max.   :47092687  
-##                 NA's   :19       NA's   :1959</code></pre>
-<p>Use the summary function to return a quick summary of only the third column</p>
-<pre class="r"><code>summary(gambling.data[,3])</code></pre>
-<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##     1.0     5.0    12.0    24.1    28.0   243.0</code></pre>
-</div>
-<div id="data-types" class="section level3">
-<h3>Data Types</h3>
-<p>Check the data class of the third column Convert the third column to factor using the factor() function Use the summary function to return a quick summary of only the third column, what changed?</p>
-<pre class="r"><code>class(gambling.data[,3])</code></pre>
-<pre><code>## [1] &quot;integer&quot;</code></pre>
-<pre class="r"><code>gambling.data[,3] &lt;- factor(gambling.data[,3])
+##                 NA's   :19       NA's   :1959      
+##       Date                    
+##  Min.   :2004-07-01 00:00:00  
+##  1st Qu.:2007-10-01 00:00:00  
+##  Median :2011-01-01 00:00:00  
+##  Mean   :2010-12-31 11:12:59  
+##  3rd Qu.:2014-04-01 00:00:00  
+##  Max.   :2017-07-01 00:00:00  
+## </code></pre>
+<pre class="r"><code>summary(brisbane.only)</code></pre>
+<pre><code>##   Month.Year        Local.Govt.Area    Approved.Sites  Operational.Sites
+##  Length:157         Length:157         Min.   :190.0   Min.   :183.0    
+##  Class :character   Class :character   1st Qu.:207.0   1st Qu.:204.0    
+##  Mode  :character   Mode  :character   Median :225.0   Median :216.0    
+##                                        Mean   :220.4   Mean   :213.5    
+##                                        3rd Qu.:233.0   3rd Qu.:226.0    
+##                                        Max.   :243.0   Max.   :235.0    
+##  Approved.EGMs  Operational.EGMs Player.Money.Lost 
+##  Min.   :8779   Min.   :8347     Min.   :27820060  
+##  1st Qu.:8997   1st Qu.:8642     1st Qu.:32591123  
+##  Median :9118   Median :8747     Median :34936940  
+##  Mean   :9076   Mean   :8723     Mean   :35825434  
+##  3rd Qu.:9176   3rd Qu.:8818     3rd Qu.:38277230  
+##  Max.   :9345   Max.   :8970     Max.   :47092687  
+##       Date                    
+##  Min.   :2004-07-01 00:00:00  
+##  1st Qu.:2007-10-01 00:00:00  
+##  Median :2011-01-01 00:00:00  
+##  Mean   :2010-12-31 11:12:59  
+##  3rd Qu.:2014-04-01 00:00:00  
+##  Max.   :2017-07-01 00:00:00</code></pre>
+<pre class="r"><code>summary(brisbane.2010.data)</code></pre>
+<pre><code>##   Month.Year        Local.Govt.Area    Approved.Sites  Operational.Sites
+##  Length:12          Length:12          Min.   :225.0   Min.   :217.0    
+##  Class :character   Class :character   1st Qu.:225.0   1st Qu.:218.0    
+##  Mode  :character   Mode  :character   Median :226.5   Median :219.5    
+##                                        Mean   :226.2   Mean   :219.4    
+##                                        3rd Qu.:227.0   3rd Qu.:220.2    
+##                                        Max.   :228.0   Max.   :222.0    
+##  Approved.EGMs  Operational.EGMs Player.Money.Lost 
+##  Min.   :9106   Min.   :8791     Min.   :30025451  
+##  1st Qu.:9124   1st Qu.:8806     1st Qu.:31981046  
+##  Median :9155   Median :8822     Median :32889535  
+##  Mean   :9171   Mean   :8836     Mean   :33519011  
+##  3rd Qu.:9194   3rd Qu.:8855     3rd Qu.:35317303  
+##  Max.   :9345   Max.   :8956     Max.   :36861039  
+##       Date                    
+##  Min.   :2010-01-01 00:00:00  
+##  1st Qu.:2010-03-24 06:00:00  
+##  Median :2010-06-16 00:00:00  
+##  Mean   :2010-06-16 11:30:00  
+##  3rd Qu.:2010-09-08 12:00:00  
+##  Max.   :2010-12-01 00:00:00</code></pre>
+<p>Use the summary function to return a quick summary of only the money column</p>
+<pre class="r"><code>summary(brisbane.2010.data$Player.Money.Lost)</code></pre>
+<pre><code>##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## 30025451 31981046 32889535 33519011 35317303 36861039</code></pre>
+<p>Get a random selection of data and look at which Local government areas are included</p>
+<pre class="r"><code>random.fifty.rows&lt;-dplyr::sample_n(gambling.data,50)
 
-summary(gambling.data[,3])</code></pre>
-<pre><code>##       3       8       5       1       2      10      19       7       9 
-##     794     500     448     417     406     365     349     339     315 
-##       4      17      11       6      20      42      18      40      43 
-##     262     244     193     190     182     180     171     168     164 
-##      25      44      21      13      15      41      12      22      14 
-##     162     161     158     150     149     144     116     114     110 
-##      16      39      26      45      56      30      24      23      77 
-##      91      90      80      76      76      75      65      62      55 
-##      28      38      65     131      29      67      47      50      57 
-##      46      46      42      42      40      37      36      35      35 
-##      49      37      58      36      64      78     133      51      63 
-##      32      31      29      28      26      26      26      21      21 
-##      34      66      76     132      74     232      68     134     137 
-##      18      17      17      17      16      15      14      14      14 
-##      35      75      55      70      72     130     138     225     238 
-##      13      13      12      12      12      12      12      10      10 
-##      46     129     136     191     192     200     237     227     228 
-##       9       7       7       7       7       7       7       6       6 
-##     135      54      73     212     214     220     233     240     241 
-##       5       4       4       4       4       4       4       4       4 
-##     242     243      48     196     204     211     222     229      69 
-##       4       4       3       3       3       3       3       3       2 
-## (Other) 
-##      39</code></pre>
+#look at each row's Local Government Area (LGA)
+random.fifty.rows$Local.Govt.Area</code></pre>
+<pre><code>##  [1] &quot;COOK&quot;              &quot;GOONDIWINDI&quot;       &quot;BARCALDINE&quot;       
+##  [4] &quot;SOMERSET&quot;          &quot;MARANOA&quot;           &quot;DOUGLAS&quot;          
+##  [7] &quot;GOLD COAST&quot;        &quot;SOUTHERN DOWNS&quot;    &quot;QUILPIE&quot;          
+## [10] &quot;MOUNT ISA&quot;         &quot;MAREEBA&quot;           &quot;BRISBANE&quot;         
+## [13] &quot;LOGAN&quot;             &quot;MURWEH&quot;            &quot;MORETON BAY&quot;      
+## [16] &quot;FRASER COAST&quot;      &quot;MORETON BAY&quot;       &quot;CENTRAL HIGHLANDS&quot;
+## [19] &quot;WEIPA&quot;             &quot;SCENIC RIM&quot;        &quot;MAREEBA&quot;          
+## [22] &quot;CENTRAL HIGHLANDS&quot; &quot;GOONDIWINDI&quot;       &quot;CHARTERS TOWERS&quot;  
+## [25] &quot;NORTH BURNETT&quot;     &quot;WEIPA&quot;             &quot;BRISBANE&quot;         
+## [28] &quot;BALONNE&quot;           &quot;LOGAN&quot;             &quot;ROCKHAMPTON&quot;      
+## [31] &quot;SUNSHINE COAST&quot;    &quot;LONGREACH&quot;         &quot;TORRES&quot;           
+## [34] &quot;SOUTHERN DOWNS&quot;    &quot;NORTH BURNETT&quot;     &quot;PAROO&quot;            
+## [37] &quot;WESTERN DOWNS&quot;     &quot;FLINDERS&quot;          &quot;SUNSHINE COAST&quot;   
+## [40] &quot;GLADSTONE&quot;         &quot;CENTRAL HIGHLANDS&quot; &quot;LIVINGSTONE&quot;      
+## [43] &quot;LOGAN&quot;             &quot;BUNDABERG&quot;         &quot;CENTRAL HIGHLANDS&quot;
+## [46] &quot;MURWEH&quot;            &quot;NOOSA&quot;             &quot;GOLD COAST&quot;       
+## [49] &quot;PAROO&quot;             &quot;MOUNT ISA&quot;</code></pre>
+<pre class="r"><code>#look at the unique local government areas (duplicates removed)
+unique(random.fifty.rows$Local.Govt.Area)</code></pre>
+<pre><code>##  [1] &quot;COOK&quot;              &quot;GOONDIWINDI&quot;       &quot;BARCALDINE&quot;       
+##  [4] &quot;SOMERSET&quot;          &quot;MARANOA&quot;           &quot;DOUGLAS&quot;          
+##  [7] &quot;GOLD COAST&quot;        &quot;SOUTHERN DOWNS&quot;    &quot;QUILPIE&quot;          
+## [10] &quot;MOUNT ISA&quot;         &quot;MAREEBA&quot;           &quot;BRISBANE&quot;         
+## [13] &quot;LOGAN&quot;             &quot;MURWEH&quot;            &quot;MORETON BAY&quot;      
+## [16] &quot;FRASER COAST&quot;      &quot;CENTRAL HIGHLANDS&quot; &quot;WEIPA&quot;            
+## [19] &quot;SCENIC RIM&quot;        &quot;CHARTERS TOWERS&quot;   &quot;NORTH BURNETT&quot;    
+## [22] &quot;BALONNE&quot;           &quot;ROCKHAMPTON&quot;       &quot;SUNSHINE COAST&quot;   
+## [25] &quot;LONGREACH&quot;         &quot;TORRES&quot;            &quot;PAROO&quot;            
+## [28] &quot;WESTERN DOWNS&quot;     &quot;FLINDERS&quot;          &quot;GLADSTONE&quot;        
+## [31] &quot;LIVINGSTONE&quot;       &quot;BUNDABERG&quot;         &quot;NOOSA&quot;</code></pre>
+<pre class="r"><code>#look at how many rows there are for each LGA
+table(random.fifty.rows$Local.Govt.Area)</code></pre>
+<pre><code>## 
+##           BALONNE        BARCALDINE          BRISBANE         BUNDABERG 
+##                 1                 1                 2                 1 
+## CENTRAL HIGHLANDS   CHARTERS TOWERS              COOK           DOUGLAS 
+##                 4                 1                 1                 1 
+##          FLINDERS      FRASER COAST         GLADSTONE        GOLD COAST 
+##                 1                 1                 1                 2 
+##       GOONDIWINDI       LIVINGSTONE             LOGAN         LONGREACH 
+##                 2                 1                 3                 1 
+##           MARANOA           MAREEBA       MORETON BAY         MOUNT ISA 
+##                 1                 2                 2                 2 
+##            MURWEH             NOOSA     NORTH BURNETT             PAROO 
+##                 2                 1                 2                 2 
+##           QUILPIE       ROCKHAMPTON        SCENIC RIM          SOMERSET 
+##                 1                 1                 1                 1 
+##    SOUTHERN DOWNS    SUNSHINE COAST            TORRES             WEIPA 
+##                 2                 2                 1                 2 
+##     WESTERN DOWNS 
+##                 1</code></pre>
+<p>Challenge: find which Local government area had the lowest non-zero amount of money lost in a month.</p>
 </div>
-<div id="creating-vectors" class="section level3">
-<h3>Creating Vectors</h3>
-<p>Create a vector called “vector” with the information from the first record</p>
-<pre class="r"><code>vector &lt;- gambling.data[1,]</code></pre>
+</div>
+<div id="data-types" class="section level2">
+<h2>Data Types</h2>
+<p>There are several different types of data you can use in R, and you can even make your own new <em>types</em> (but we won’t touch on that today). Now we will examine a few common ones in a little more detail.</p>
+<div id="strings" class="section level3">
+<h3>Strings</h3>
+<p>Character strings are known as “character” in R:</p>
+<pre class="r"><code>gambling.data$Local.Govt.Area[3]</code></pre>
+<pre><code>## [1] &quot;BARCALDINE&quot;</code></pre>
+<pre class="r"><code>class(gambling.data$Local.Govt.Area)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+</div>
+<div id="numbers" class="section level3">
+<h3>Numbers</h3>
+<p>Numbers have different classes, they can be integer:</p>
+<pre class="r"><code>gambling.data$Operational.EGMs[36]</code></pre>
+<pre><code>## [1] 531</code></pre>
+<pre class="r"><code>class(gambling.data$Operational.EGMs)</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<p>They can be numeric:</p>
+<pre class="r"><code>gambling.data$Player.Money.Lost[84]</code></pre>
+<pre><code>## [1] 3913829</code></pre>
+<pre class="r"><code>class(gambling.data$Player.Money.Lost)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>class(0.1)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>class(pi)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<p>They can be complex:</p>
+<pre class="r"><code>class(1i+3)</code></pre>
+<pre><code>## [1] &quot;complex&quot;</code></pre>
+<p>They can be double:</p>
+<pre class="r"><code>x&lt;-as.double(3.345678987654323456789)</code></pre>
+<p>They can have rounding errors</p>
+<pre class="r"><code>x-(x-0.0000000000001)</code></pre>
+<pre><code>## [1] 9.992007e-14</code></pre>
+</div>
+<div id="logical-truefalse" class="section level3">
+<h3>Logical (True/False)</h3>
+<pre class="r"><code>class(TRUE)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<pre class="r"><code>class(1==1)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+</div>
+<div id="factor" class="section level3">
+<h3>Factor</h3>
+<p>A factor is a string label on top of an integer index</p>
+<pre class="r"><code>as.factor(&quot;I am a label&quot;)</code></pre>
+<pre><code>## [1] I am a label
+## Levels: I am a label</code></pre>
+<p>This makes most sense in the context of a survey response, e.g. 1=Good, 2, 3=Average, 4, 5=Bad; or something like that. For example in the simple data we had at the beginning, gender is a factor.</p>
+<pre class="r"><code>class(simple.data$gender)</code></pre>
+<pre><code>## [1] &quot;factor&quot;</code></pre>
+<pre class="r"><code>simple.data$gender</code></pre>
+<pre><code>## [1] Female Male   Female Male  
+## Levels: Female Male</code></pre>
+<pre class="r"><code>as.numeric(simple.data$gender)</code></pre>
+<pre><code>## [1] 1 2 1 2</code></pre>
+<pre class="r"><code>table(simple.data$gender)</code></pre>
+<pre><code>## 
+## Female   Male 
+##      2      2</code></pre>
+</div>
+<div id="vectors-and-lists" class="section level3">
+<h3>Vectors and Lists</h3>
+<p>Vectors are all of the same class</p>
+<pre class="r"><code>#a vector
+c(&quot;a&quot;,&quot;b&quot;,&quot;c&quot;)</code></pre>
+<pre><code>## [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;</code></pre>
+<pre class="r"><code>#another vector
+c(1,4,7)</code></pre>
+<pre><code>## [1] 1 4 7</code></pre>
+<p>If you try to put different classes of things into a vector it will try to convert them to the same class.</p>
+<pre class="r"><code>#this will be converted to a vector of character strings
+(what.am.I&lt;-c(&quot;a&quot;,2,&quot;c&quot;,FALSE,c(1,2,3)))</code></pre>
+<pre><code>## [1] &quot;a&quot;     &quot;2&quot;     &quot;c&quot;     &quot;FALSE&quot; &quot;1&quot;     &quot;2&quot;     &quot;3&quot;</code></pre>
+<pre class="r"><code>class(what.am.I)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>Lists can contain different classes of things in each element, possibly of different lengths</p>
+<pre class="r"><code>#a list
+list(&quot;a&quot;,2,&quot;c&quot;,FALSE,c(1,2,3))</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;a&quot;
+## 
+## [[2]]
+## [1] 2
+## 
+## [[3]]
+## [1] &quot;c&quot;
+## 
+## [[4]]
+## [1] FALSE
+## 
+## [[5]]
+## [1] 1 2 3</code></pre>
+</div>
+<div id="data-frames" class="section level3">
+<h3>Data frames</h3>
+<p>Data frames are really a list of vectors of equal length, and they function like a table of data. We made one right at the beginning:</p>
+<pre class="r"><code>simple.data&lt;-data.frame(first.name=c(&quot;Alice&quot;,
+                                     &quot;Bob&quot;,
+                                     &quot;Cathy&quot;,
+                                     &quot;Daniel&quot;),
+                        gender=as.factor(c(&quot;Female&quot;,
+                                           &quot;Male&quot;,
+                                           &quot;Female&quot;,
+                                           &quot;Male&quot;)),
+                        favourite.number=c(4,23,pi,exp(1)),
+                        favourite.letter=c(&quot;a&quot;,&quot;c&quot;,&quot;x&quot;,&quot;q&quot;),
+                        favourite.weekday=c(&quot;Monday&quot;,&quot;Thursday&quot;,&quot;Sunday&quot;,&quot;Friday&quot;),
+                        stringsAsFactors = FALSE)</code></pre>
+<ul>
+<li><p>We made a column called “first.name”, a vector of character strings (favourite.letter and favourite.weekday are also character strings)</p></li>
+<li><p>We made a column called “gender”, a vector of factors</p></li>
+<li><p>We made a column called “favourite.number”, a vector of class numeric</p></li>
+<li><p>Lastly we told it to not convert all the character string colums into factors (which is something it does by default) by adding the optional argument <code>stringsAsFactors = FALSE</code> to the <code>data.frame()</code> function.</p></li>
+</ul>
 </div>
 <div id="adding-records" class="section level3">
 <h3>Adding records</h3>
-<p>Add vector to the data set using the rbind() function Add a new column called “source” to the data set, where each record is “Wankarani Settlement Dataset” Add a new column called “author” to the data set, where each record is “Timothy L. McAndrews”</p>
-<pre class="r"><code>gambling.data[136,] &lt;- vector
-gambling.data$source &lt;- &quot;Wankarani Settlement dataset&quot;
-gambling.data$author &lt;- &quot;Timothy L. McAndrews&quot;</code></pre>
+<p>Add a new row to the data set using the rbind() function:</p>
+<pre class="r"><code>new.person &lt;- data.frame(first.name=&quot;Evelyn&quot;,
+                        gender=&quot;Female&quot;,
+                        favourite.number=12,
+                        favourite.letter=&quot;z&quot;,
+                        favourite.weekday=&quot;Monday&quot;,
+                        stringsAsFactors = FALSE)
+
+simple.data&lt;-rbind(simple.data,new.person)</code></pre>
 </div>
 <div id="writing-data" class="section level3">
 <h3>Writing Data</h3>
 <p>Use the write.table() function to make the datafile a text file</p>
-<pre class="r"><code>write.table(x = gambling.data,
-            file = &quot;gamblingData.txt&quot;,
+<pre class="r"><code>write.table(x = simple.data,
+            file = &quot;simpleData.txt&quot;,
             row.names = FALSE,
             col.names = TRUE,
             sep = &quot;,&quot;)</code></pre>
 <p>Use the write.csv() function to make the datafile a csv (comma separated values) file</p>
-<pre class="r"><code>write.csv(x = gambling.data,
-          file = &quot;gamblingData.csv&quot;,
-          row.names = FALSE,
-          col.names = TRUE,
-          sep = &quot;,&quot;)</code></pre>
-<pre><code>## Warning in write.csv(x = gambling.data, file = &quot;gamblingData.csv&quot;,
-## row.names = FALSE, : attempt to set 'col.names' ignored</code></pre>
-<pre><code>## Warning in write.csv(x = gambling.data, file = &quot;gamblingData.csv&quot;,
-## row.names = FALSE, : attempt to set 'sep' ignored</code></pre>
+<pre class="r"><code>write.csv(x = simple.data,
+          file = &quot;simpleData.csv&quot;,
+          row.names = FALSE)</code></pre>
 <p>Use the write.xlsx</p>
 </div>
 </div>
