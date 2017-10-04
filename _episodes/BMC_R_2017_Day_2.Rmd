@@ -1,14 +1,16 @@
 ---
 title: "The Brain & Mind Centre"
-subtitle: "Day 2"
 author: "Sydney Informatics Hub"
+subtitle: Day 2
 output:
   html_document:
-    toc: true
-    toc_float:
-      collapsed: false
-    theme: lumen
     hightlight: github
+    theme: lumen
+    toc: yes
+    toc_float:
+      collapsed: no
+  pdf_document:
+    toc: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -16,119 +18,146 @@ knitr::opts_chunk$set(echo = TRUE,
                       cache = FALSE)
 ```
 
-## Introduction
+## Controls & Loops
 
-Hello this is day 2
+These allow you to control the flow of execution of a script typically inside of a function. Common ones include:
 
-### Installation & Setup
+* if, else
+* for
+* while
+* repeat
+* break
+* next
+* function
 
-blah
+### If loop
+```{r, eval=FALSE, message=FALSE}
 
-```{r installation, eval=FALSE, message=FALSE}
-LoadPackages <- function(x){ for( i in x ){ if( ! require( i , character.only = TRUE ) ){
-  install.packages( i , dependencies = TRUE , repos = "http://cran.us.r-project.org")
-  require( i , character.only = TRUE )}}}
+if (condition) {
+    # do something
+} else {
+    # do something else
+}
 
-#  Then try/install packages...
-LoadPackages(c("tidyverse",
-               "xlsx",
-               "ggplot2",
-               "foreign",
-               "dplyr"))
-
-#options(max.print = 100)
-
-options(scipen = 999)
-set.seed(5)
 ```
 
-## About R
-
-### The R Programming Language
-
-[R](https://www.r-project.org/) is an open source programming language and software environment for statistical computing and graphics that is supported by the R Foundation for Statistical Computing. Today, it is one of the most popular languages, being used all across the world in a wide variety of domains and fields.
-
-### RStudio
-
-[RStudio](https://www.rstudio.com/) is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.
-
-## Getting Started
-
-### Calculating things in R
-
-Standard math functions work in R:
-```{r}
-2+3
-
-1e5-5e4
-
-1/1000
-
-sqrt(2)
-
-2*pi
-```
-
-Let's use vectors:
+e.g.
 
 ```{r}
-1:10
-
-2*(1:10)
-
-2^(1:10)
+x=1
+if(x > 1) {
+  print("x is greater than 1")
+  } else {
+    print("x is less than 1")
+  } 
 ```
 
-We can store values:
+### For loops
+
+A for loop works on an iterable variable and assigns successive values till the end of a sequence.
 
 ```{r}
-x<-3
-x=3
-3->x
-x
-x^2
+for (i in 1:10) {
+    print(i)
+}
+
 ```
-
-### Vectors
-
-We can store vectors:
 
 ```{r}
-x<-1:10
-x
-2^x
+x <- c("apples", "oranges", "bananas", "strawberries")
 
-y<-c(3,4,5)
-y^2
+for (i in 1:4) {
+    print(x[i])
+}
 
-some.fruits<-c("apple","orange","banana")
-some.fruits
+for (i in seq(x)) {
+    print(x[i])
+}
+
+for (i in 1:4) print(x[i])
 ```
 
-### Working with Simple Data
+### While loop
+```{r}
+i <- 1
+while (i < 10) {
+    print(i)
+    i <- i + 1
+}
+```
 
-A lot of the time in R we are working with tables of data, know as "data frames". 
+Be sure there is a way to exit out of a while loop.
 
-Commonly, 
+### Repeat Loops
 
-**rows** may represent instances e.g. *data points*, *people*, *events*, etc. while 
-
-**columns** will represent different types of data associated with each data point or instance e.g. *Name*, *ID*, *location*, *time*, *value*...
-
-Here is an example data frame
+The repeat loop is an infinite loop and used in association with a break statement.
 
 ```{r}
-simple.data<-data.frame(first.name=c("Alice",
-                                     "Bob",
-                                     "Cathy",
-                                     "Daniel"),
-                        gender=as.factor(c("Female",
-                                           "Male",
-                                           "Female",
-                                           "Male")),
-                        favourite.number=c(4,23,pi,exp(1)),
-                        favourite.letter=c("a","c","x","q"),
-                        favourite.weekday=c("Monday","Thursday","Sunday","Friday"),
-                        stringsAsFactors = FALSE)
+a = 1
+repeat { 
+  print(a) 
+  a = a+1 
+  if(a > 4) break }
+
 ```
 
+### Break statement
+
+A break statement is used in a loop to stop the iterations and flow the control outside of the loop.
+
+```{r}
+x = 1:10 
+ for (i in x){ 
+     if (i == 2){ 
+         break 
+     }
+     print(i)
+ }
+```
+
+### Next statement
+
+Next statement enables to skip the current iteration of a loop without terminating it.
+
+```{r}
+x = 1: 4 
+ for (i in x) { 
+     if (i == 2){ 
+         next}
+     print(i)
+ }
+```
+
+### Function
+
+If you have to repeat the same few lines of code more than once, then you really need to write a function. Functions are a fundamental building block of R. You use them all the time in R and it's not that much harder to string functions together (or write entirely new ones from scratch) to do more.
+
+* R functions are objects just like anything else.
+* By default, R function arguments are lazy - they're only evaluated if they're actually used:
+* Every call on a R object is almost always a function call.
+
+#### Basic components of a function
+
+* The body(), the code inside the function.
+* The formals(), the "formal" argument list, which controls how you can call the function.
+* The `environment()`` which determines how variables referred to inside the function are found.
+* args() to list arguments.
+
+```{r}
+# Addition 
+add <- function(a, b) {
+    return(a + b)
+}
+
+add(2,5)
+```
+
+#### Examples from gambling dataset
+
+
+
+Adapted from :
+
+https://ramnathv.github.io/pycon2014-r/learn/controls.html
+
+https://www.r-bloggers.com/control-structures-loops-in-r/
