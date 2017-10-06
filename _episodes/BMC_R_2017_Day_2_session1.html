@@ -375,9 +375,73 @@ add(2,5)</code></pre>
 </div>
 <div id="examples-from-gambling-dataset" class="section level4">
 <h4>Examples from gambling dataset</h4>
+<pre><code>##          Month.Year Local.Govt.Area Approved.Sites Operational.Sites
+## 3635   January 2010        BRISBANE            227               220
+## 3690  February 2010        BRISBANE            227               220
+## 3745     March 2010        BRISBANE            227               220
+## 3800     April 2010        BRISBANE            227               221
+## 3855       May 2010        BRISBANE            228               222
+## 3910      June 2010        BRISBANE            227               222
+## 3965      July 2010        BRISBANE            226               219
+## 4020    August 2010        BRISBANE            226               218
+## 4075 September 2010        BRISBANE            225               218
+## 4130   October 2010        BRISBANE            225               218
+## 4185  November 2010        BRISBANE            225               218
+## 4240  December 2010        BRISBANE            225               217
+##      Approved.EGMs Operational.EGMs Player.Money.Lost       Date
+## 3635          9183             8834          31268720 2010-01-01
+## 3690          9175             8854          30025451 2010-02-01
+## 3745          9225             8859          32183381 2010-03-01
+## 3800          9345             8956          32017037 2010-04-01
+## 3855          9230             8815          32244843 2010-05-01
+## 3910          9166             8872          31873072 2010-06-01
+## 3965          9144             8809          36225638 2010-07-01
+## 4020          9119             8791          36861039 2010-08-01
+## 4075          9106             8812          34763792 2010-09-01
+## 4130          9106             8799          36211785 2010-10-01
+## 4185          9126             8830          33534227 2010-11-01
+## 4240          9126             8797          35019142 2010-12-01</code></pre>
+<div id="example-1-iterateloop-through-brisbane.2010.data-and-sum-up-the-player.money.lost" class="section level5">
+<h5>Example 1 : Iterate(Loop) through brisbane.2010.data and sum up the Player.Money.Lost</h5>
+<pre class="r"><code># Iterate(Loop) through brisbane.2010.data and sum up the Player.Money.Lost
+
+brisbane.2010.player.money.lost &lt;- c(brisbane.2010.data$Player.Money.Lost)
+
+total.money.lost = 0
+
+for(i in 1:length(brisbane.2010.player.money.lost)) {
+    
+  total.money.lost = total.money.lost + brisbane.2010.player.money.lost[i]
+
+}
+
+# Print total amout of money lost
+print(total.money.lost)</code></pre>
+<pre><code>## [1] 402228128</code></pre>
+</div>
+<div id="example-2-create-a-function-to-sum-up-money-lost-by-passing-vector-of-player.money.lost-values" class="section level5">
+<h5>Example 2 : Create a function to sum up money lost by passing vector of player.money.lost values</h5>
+<pre class="r"><code># Create a function to sum up money lost by passing vector of player.money.lost values
+sum.money.lost &lt;- function(a){
+  
+  total.money.lost = 0
+
+  # Iterate through vector 
+  for(i in 1:length(a)) {
+    
+    total.money.lost = total.money.lost + a[i]
+
+  }
+  return(total.money.lost)
+}
+
+# Call function sum.money.lost
+sum.money.lost(brisbane.2010.player.money.lost)</code></pre>
+<pre><code>## [1] 402228128</code></pre>
 <p>Adapted from :</p>
 <p><a href="https://ramnathv.github.io/pycon2014-r/learn/controls.html" class="uri">https://ramnathv.github.io/pycon2014-r/learn/controls.html</a></p>
 <p><a href="https://www.r-bloggers.com/control-structures-loops-in-r/" class="uri">https://www.r-bloggers.com/control-structures-loops-in-r/</a></p>
+</div>
 </div>
 </div>
 </div>

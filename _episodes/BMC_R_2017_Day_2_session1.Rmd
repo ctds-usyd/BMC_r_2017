@@ -154,6 +154,72 @@ add(2,5)
 
 #### Examples from gambling dataset
 
+```{r,echo=FALSE}
+gambling.data <- read.csv(file = "http://data.justice.qld.gov.au/JSD/OLGR/20170817_OLGR_LGA-EGM-data.csv",
+                 header = TRUE,
+                 sep = ",",
+                 stringsAsFactors = FALSE)
+
+names(gambling.data)[2] <- "Local.Govt.Area"
+
+names(gambling.data)[7] <- "Player.Money.Lost"
+
+#Add a day of month (1st) to each date string
+date.string <- paste0( "1 " , gambling.data$Month.Year )
+
+#Convert to POSIXlt, a date-time format
+strptime( date.string , format = "%d %B %Y" ) -> gambling.data$Date
+
+brisbane.only<-gambling.data[gambling.data$Local.Govt.Area=="BRISBANE",]
+row.indicies<-(brisbane.only$Date>="2010-01-01 AEST" &
+                 brisbane.only$Date<="2010-12-31 AEST")
+
+(brisbane.2010.data<-brisbane.only[row.indicies,])
+```
+
+##### Example 1 : Iterate(Loop) through brisbane.2010.data and sum up the Player.Money.Lost
+
+```{r}
+# Iterate(Loop) through brisbane.2010.data and sum up the Player.Money.Lost
+
+brisbane.2010.player.money.lost <- c(brisbane.2010.data$Player.Money.Lost)
+
+total.money.lost = 0
+
+for(i in 1:length(brisbane.2010.player.money.lost)) {
+    
+  total.money.lost = total.money.lost + brisbane.2010.player.money.lost[i]
+
+}
+
+# Print total amout of money lost
+print(total.money.lost)
+```
+
+
+##### Example 2 : Create a function to sum up money lost by passing vector of player.money.lost values
+
+```{r}
+# Create a function to sum up money lost by passing vector of player.money.lost values
+sum.money.lost <- function(a){
+  
+  total.money.lost = 0
+
+  # Iterate through vector 
+  for(i in 1:length(a)) {
+    
+    total.money.lost = total.money.lost + a[i]
+
+  }
+  return(total.money.lost)
+}
+
+# Call function sum.money.lost
+sum.money.lost(brisbane.2010.player.money.lost)
+```
+
+
+
 
 
 Adapted from :
