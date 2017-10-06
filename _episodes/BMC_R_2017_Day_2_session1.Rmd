@@ -13,12 +13,25 @@ output:
     toc: yes
 ---
 
+<!-- https://stackoverflow.com/questions/46201753/rmarkdown-indentation-of-toc-items-in-html-output -->
+<script>
+$(document).ready(function() {
+  $items = $('div#TOC li');
+  $items.each(function(idx) {
+    num_ul = $(this).parentsUntil('#TOC').length;
+    $(this).css({'text-indent': num_ul * 10, 'padding-left': 0});
+  });
+
+});
+</script>
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
                       cache = FALSE)
 ```
 
-## Controls & Loops
+# Controls & Loops
 
 These allow you to control the flow of execution of a script typically inside of a function. Common ones include:
 
@@ -30,7 +43,9 @@ These allow you to control the flow of execution of a script typically inside of
 * next
 * function
 
-### If loop
+## Control statements
+
+### If statement
 ```{r, eval=FALSE, message=FALSE}
 
 if (condition)
@@ -41,7 +56,7 @@ if (condition)
 
 Sometimes, we want to do something even if the if-statement returns FALSE. In this case, we use an else statement.
 
-### If..else statement
+### If else statement
 ```{r, eval=FALSE, message=FALSE}
 
 if (condition)
@@ -59,7 +74,7 @@ Hadley Wickham has published a style guide for R http://adv-r.had.co.nz/Style.ht
 
 "An opening curly brace should never go on its own line and should always be followed by a new line. A closing curly brace should always go on its own line, unless it’s followed by else. Always indent the code inside curly braces.""
 
-#### If..else statements with better styling
+#### If else statements with better styling
 ```{r, eval=FALSE, message=FALSE}
 
 if (condition) {
@@ -118,6 +133,7 @@ mhi5_score <- 45
 ```
 
 
+## Loops
 
 ### For loops
 
@@ -152,7 +168,7 @@ for (i in x) print(i)
 ```
 
 
-### For loop example with the gambling dataset
+### For loop examples
 
 We've seen that we can use for loops for vectors. We can also use for loops for data frames
 
@@ -203,6 +219,7 @@ for (i in 1:numcols) {
 }
 ```
 
+
 #### For loops and if statements
 We can incorporate our knowledge of if..else statements with for-loops. 
 
@@ -226,6 +243,7 @@ for (i in 1:numrows) {
   # write your code here 
 }
 ```
+
 
 
 
@@ -275,7 +293,7 @@ for (i in x) {
 }
 ```
 
-### Function
+## User-defined functions
 
 If you have to repeat the same few lines of code more than once, then you really need to write a function. Functions are a fundamental building block of R. You use them all the time in R and it's not that much harder to string functions together (or write entirely new ones from scratch) to do more.
 
@@ -287,85 +305,78 @@ If you have to repeat the same few lines of code more than once, then you really
 
 * The body(), the code inside the function.
 * The formals(), the "formal" argument list, which controls how you can call the function.
-* The `environment()`` which determines how variables referred to inside the function are found.
+* The environment() which determines how variables referred to inside the function are found.
 * args() to list arguments.
 
 ```{r}
-# Addition 
-add <- function(a, b) {
-  return(a + b)
+myFunction <- function(parameter1, parameter2) {
+  # do something with parameter1 and parameter2
+  value <- parameter1 + parameter2
+  return(value)
+}
+```
+
+Functions should have good descriptive names
+
+```{r}
+# Create a function to perform addition
+add <- function(num1, num2) {
+  return(num1 + num2)
 }
 
+# Call the add function
 add(2,5)
 ```
 
-#### Examples from gambling dataset
+
+#### Example 1 : Loop through brisbane.2010.data and sum up the Player.Money.Lost
 
 ```{r}
-# read in the gambling data from Day 1
-gambling.data <- read.csv(file = "http://data.justice.qld.gov.au/JSD/OLGR/20170817_OLGR_LGA-EGM-data.csv",
-                 header = TRUE,
-                 sep = ",",
-                 stringsAsFactors = FALSE)
+total.money.lost <- 0
 
-# rename columns
-names(gambling.data)[2] <- "Local.Govt.Area"
-names(gambling.data)[7] <- "Player.Money.Lost"
-
-#Add a day of month (1st) to each date string
-date.string <- paste0( "1 " , gambling.data$Month.Year )
-
-#Convert to POSIXlt, a date-time format
-strptime( date.string , format = "%d %B %Y" ) -> gambling.data$Date
-
-# subset to Brisbane only 
-brisbane.only <- gambling.data[gambling.data$Local.Govt.Area=="BRISBANE",]
-row.indicies <- (brisbane.only$Date>="2010-01-01 AEST" &
-                 brisbane.only$Date<="2010-12-31 AEST")
-
-(brisbane.2010.data <- brisbane.only[row.indicies,])
-```
-
-##### Example 1 : Iterate(Loop) through brisbane.2010.data and sum up the Player.Money.Lost
-
-```{r}
-# Iterate(Loop) through brisbane.2010.data and sum up the Player.Money.Lost
-
-brisbane.2010.player.money.lost <- c(brisbane.2010.data$Player.Money.Lost)
-
-total.money.lost = 0
-
-for(i in 1:length(brisbane.2010.player.money.lost)) {
-    
-  total.money.lost = total.money.lost + brisbane.2010.player.money.lost[i]
-
+for (i in 1:nrow(brisbane.2010.data)) {
+  total.money.lost = total.money.lost + brisbane.2010.data[i, "Player.Money.Lost"]
 }
 
-# Print total amout of money lost
 print(total.money.lost)
 ```
 
 
-##### Example 2 : Create a function to sum up money lost by passing vector of player.money.lost values
+#### Example 2 : Create a function to sum up money lost by passing vector of player.money.lost values
 
 ```{r}
-# Create a function to sum up money lost by passing vector of player.money.lost values
-sum.money.lost <- function(a){
+sumMoneyLost <- function(some.gambling.dataframe){
   
   total.money.lost = 0
 
-  # Iterate through vector 
-  for(i in 1:length(a)) {
-    
-    total.money.lost = total.money.lost + a[i]
-
+  for (i in 1:nrow(some.gambling.dataframe)) {
+    total.money.lost = total.money.lost + some.gambling.dataframe[i, "Player.Money.Lost"]
   }
   return(total.money.lost)
 }
 
 # Call function sum.money.lost
-sum.money.lost(brisbane.2010.player.money.lost)
+sumMoneyLost(brisbane.2010.data)
+
 ```
+
+With user-defined functions, you won't need to repeat your code over and over again. You can just call it for another dataset
+
+```{r}
+sumMoneyLost(brisbane.only)
+```
+
+
+If, however, there is already a function to perform what you need, save time and use that instead.
+
+```{r}
+# This will return NA
+sumMoneyLost(gambling.data)
+
+# We will use the sum() function instead which has a na.rm option
+sum(gambling.data$Player.Money.Lost, na.rm = TRUE)
+```
+
 
 
 
