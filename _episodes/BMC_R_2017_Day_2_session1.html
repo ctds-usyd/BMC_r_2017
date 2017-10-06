@@ -241,25 +241,72 @@ div.tocify {
 </ul>
 <div id="if-loop" class="section level3">
 <h3>If loop</h3>
-<pre class="r"><code>if (condition) {
-    # do something
-} else {
-    # do something else
+<pre class="r"><code>if (condition)
+{
+  # do something
+} </code></pre>
+<p>Sometimes, we want to do something even if the if-statement returns FALSE. In this case, we use an else statement.</p>
+</div>
+<div id="if..else-statement" class="section level3">
+<h3>If..else statement</h3>
+<pre class="r"><code>if (condition)
+{
+  # do something
+} 
+else 
+{
+  # do something else
 }</code></pre>
-<p>e.g.</p>
-<pre class="r"><code>x=1
-if(x &gt; 1) {
+<p>Hadley Wickham has published a style guide for R <a href="http://adv-r.had.co.nz/Style.html" class="uri">http://adv-r.had.co.nz/Style.html</a>.</p>
+<p>“An opening curly brace should never go on its own line and should always be followed by a new line. A closing curly brace should always go on its own line, unless it’s followed by else. Always indent the code inside curly braces.”&quot;</p>
+<div id="if..else-statements-with-better-styling" class="section level4">
+<h4>If..else statements with better styling</h4>
+<pre class="r"><code>if (condition) {
+  # do something
+} else {
+  # do something else
+}</code></pre>
+<p>An example of if..else statement:</p>
+<pre class="r"><code>x &lt;- 1
+if (x &gt; 1) {
   print(&quot;x is greater than 1&quot;)
-  } else {
-    print(&quot;x is less than 1&quot;)
-  } </code></pre>
-<pre><code>## [1] &quot;x is less than 1&quot;</code></pre>
+} else {
+  print(&quot;x is less than or equal to 1&quot;)
+} </code></pre>
+<pre><code>## [1] &quot;x is less than or equal to 1&quot;</code></pre>
+</div>
+</div>
+<div id="if-else-if-and-else-statements" class="section level3">
+<h3>If, else if and else statements</h3>
+<pre class="r"><code>if (condition1) {
+  # do something
+} else if (condition2) {
+  # do something else
+} else {
+  # do something different
+}</code></pre>
+<p>For example:</p>
+<pre class="r"><code>x &lt;- 1
+if (x &gt; 1) {
+  print(&quot;x is greater than 1&quot;)
+} else if ( x &lt; 1) {
+  print (&quot;x is less than 1&quot;)
+} else {
+  print(&quot;x is equal to 1&quot;)
+} </code></pre>
+<pre><code>## [1] &quot;x is equal to 1&quot;</code></pre>
+<div id="quiz" class="section level4">
+<h4>Quiz</h4>
+<p>Write a set of if..else statements that will test a variable “mhi5_score”. Print out “depression” if it is less than 52 and “control” if it is greater than or equal to 52</p>
+<pre class="r"><code>mhi5_score &lt;- 45
+# put your if else statements here</code></pre>
+</div>
 </div>
 <div id="for-loops" class="section level3">
 <h3>For loops</h3>
-<p>A for loop works on an iterable variable and assigns successive values till the end of a sequence.</p>
+<p>A for-loop works on an iterable variable and assigns successive values till the end of a sequence.</p>
 <pre class="r"><code>for (i in 1:10) {
-    print(i)
+  print(i)
 }</code></pre>
 <pre><code>## [1] 1
 ## [1] 2
@@ -274,31 +321,144 @@ if(x &gt; 1) {
 <pre class="r"><code>x &lt;- c(&quot;apples&quot;, &quot;oranges&quot;, &quot;bananas&quot;, &quot;strawberries&quot;)
 
 for (i in 1:4) {
-    print(x[i])
+  print(x[i])
 }</code></pre>
 <pre><code>## [1] &quot;apples&quot;
 ## [1] &quot;oranges&quot;
 ## [1] &quot;bananas&quot;
 ## [1] &quot;strawberries&quot;</code></pre>
-<pre class="r"><code>for (i in seq(x)) {
-    print(x[i])
-}</code></pre>
-<pre><code>## [1] &quot;apples&quot;
-## [1] &quot;oranges&quot;
-## [1] &quot;bananas&quot;
-## [1] &quot;strawberries&quot;</code></pre>
+<p>For short-hand coding, we can put the contents of the loop on the same line as the for-statement</p>
 <pre class="r"><code>for (i in 1:4) print(x[i])</code></pre>
 <pre><code>## [1] &quot;apples&quot;
 ## [1] &quot;oranges&quot;
 ## [1] &quot;bananas&quot;
 ## [1] &quot;strawberries&quot;</code></pre>
+<p>We can also simply print out each element of our vector using a for-loop to traverse it</p>
+<pre class="r"><code>for (i in x) print(i)</code></pre>
+<pre><code>## [1] &quot;apples&quot;
+## [1] &quot;oranges&quot;
+## [1] &quot;bananas&quot;
+## [1] &quot;strawberries&quot;</code></pre>
+</div>
+<div id="for-loop-example-with-the-gambling-dataset" class="section level3">
+<h3>For loop example with the gambling dataset</h3>
+<p>We’ve seen that we can use for loops for vectors. We can also use for loops for data frames</p>
+<pre class="r"><code># read in the gambling data from Day 1
+gambling.data &lt;- read.csv(file = &quot;http://data.justice.qld.gov.au/JSD/OLGR/20170817_OLGR_LGA-EGM-data.csv&quot;,
+                 header = TRUE,
+                 sep = &quot;,&quot;,
+                 stringsAsFactors = FALSE)
+
+# rename columns
+names(gambling.data)[2] &lt;- &quot;Local.Govt.Area&quot;
+names(gambling.data)[7] &lt;- &quot;Player.Money.Lost&quot;
+
+#Add a day of month (1st) to each date string
+date.string &lt;- paste0( &quot;1 &quot; , gambling.data$Month.Year )
+
+#Convert to POSIXlt, a date-time format
+strptime( date.string , format = &quot;%d %B %Y&quot; ) -&gt; gambling.data$Date
+
+# subset to Brisbane only 
+brisbane.only &lt;- gambling.data[gambling.data$Local.Govt.Area==&quot;BRISBANE&quot;,]
+row.indicies &lt;- (brisbane.only$Date&gt;=&quot;2010-01-01 AEST&quot; &amp;
+                 brisbane.only$Date&lt;=&quot;2010-12-31 AEST&quot;)
+
+(brisbane.2010.data &lt;- brisbane.only[row.indicies,])</code></pre>
+<pre><code>##          Month.Year Local.Govt.Area Approved.Sites Operational.Sites
+## 3635   January 2010        BRISBANE            227               220
+## 3690  February 2010        BRISBANE            227               220
+## 3745     March 2010        BRISBANE            227               220
+## 3800     April 2010        BRISBANE            227               221
+## 3855       May 2010        BRISBANE            228               222
+## 3910      June 2010        BRISBANE            227               222
+## 3965      July 2010        BRISBANE            226               219
+## 4020    August 2010        BRISBANE            226               218
+## 4075 September 2010        BRISBANE            225               218
+## 4130   October 2010        BRISBANE            225               218
+## 4185  November 2010        BRISBANE            225               218
+## 4240  December 2010        BRISBANE            225               217
+##      Approved.EGMs Operational.EGMs Player.Money.Lost       Date
+## 3635          9183             8834          31268720 2010-01-01
+## 3690          9175             8854          30025451 2010-02-01
+## 3745          9225             8859          32183381 2010-03-01
+## 3800          9345             8956          32017037 2010-04-01
+## 3855          9230             8815          32244843 2010-05-01
+## 3910          9166             8872          31873072 2010-06-01
+## 3965          9144             8809          36225638 2010-07-01
+## 4020          9119             8791          36861039 2010-08-01
+## 4075          9106             8812          34763792 2010-09-01
+## 4130          9106             8799          36211785 2010-10-01
+## 4185          9126             8830          33534227 2010-11-01
+## 4240          9126             8797          35019142 2010-12-01</code></pre>
+<p>We can traverse across each row of the data frame</p>
+<pre class="r"><code># for each row in brisbane.2010.data, print the player money lost
+numrows &lt;- nrow(brisbane.2010.data)
+for (i in 1:numrows) {
+  print(brisbane.2010.data[i, &quot;Player.Money.Lost&quot;])
+}</code></pre>
+<pre><code>## [1] 31268720
+## [1] 30025451
+## [1] 32183381
+## [1] 32017037
+## [1] 32244843
+## [1] 31873072
+## [1] 36225638
+## [1] 36861039
+## [1] 34763792
+## [1] 36211785
+## [1] 33534227
+## [1] 35019142</code></pre>
+<p>Or across each column of the data frame</p>
+<pre class="r"><code># for each column in brisbane.2010.data, print the data type using the class() function
+numcols &lt;- ncol(brisbane.2010.data)
+for (i in 1:numcols) {
+  columndata &lt;- brisbane.2010.data[, i]
+  print(class(columndata))
+}</code></pre>
+<pre><code>## [1] &quot;character&quot;
+## [1] &quot;character&quot;
+## [1] &quot;integer&quot;
+## [1] &quot;integer&quot;
+## [1] &quot;integer&quot;
+## [1] &quot;integer&quot;
+## [1] &quot;numeric&quot;
+## [1] &quot;POSIXlt&quot; &quot;POSIXt&quot;</code></pre>
+<div id="for-loops-and-if-statements" class="section level4">
+<h4>For loops and if statements</h4>
+<p>We can incorporate our knowledge of if..else statements with for-loops.</p>
+<pre class="r"><code># for each row, print those where the Player.Money.Lost is greater than 32 million
+numrows &lt;- nrow(brisbane.2010.data)
+for (i in 1:numrows) {
+  if (brisbane.2010.data[i, &quot;Player.Money.Lost&quot;] &gt; 32000000){
+    print(brisbane.2010.data[i, &quot;Player.Money.Lost&quot;])
+  }
+}</code></pre>
+<pre><code>## [1] 32183381
+## [1] 32017037
+## [1] 32244843
+## [1] 36225638
+## [1] 36861039
+## [1] 34763792
+## [1] 36211785
+## [1] 33534227
+## [1] 35019142</code></pre>
+</div>
+<div id="quiz-1" class="section level4">
+<h4>Quiz</h4>
+<p>For each row of the brisbane.2010.data dataframe, write code to test whether the Player.Money.Lost value is greater than 32 million. If so, print “Greater than 32 million”. Otherwise, print “Not greater than 32 million”</p>
+<pre class="r"><code>numrows &lt;- nrow(brisbane.2010.data)
+for (i in 1:numrows) {
+  # write your code here 
+}</code></pre>
+</div>
 </div>
 <div id="while-loop" class="section level3">
 <h3>While loop</h3>
 <pre class="r"><code>i &lt;- 1
 while (i &lt; 10) {
-    print(i)
-    i &lt;- i + 1
+  print(i)
+  i &lt;- i + 1
 }</code></pre>
 <pre><code>## [1] 1
 ## [1] 2
@@ -309,42 +469,34 @@ while (i &lt; 10) {
 ## [1] 7
 ## [1] 8
 ## [1] 9</code></pre>
-<p>Be sure there is a way to exit out of a while loop.</p>
-</div>
-<div id="repeat-loops" class="section level3">
-<h3>Repeat Loops</h3>
-<p>The repeat loop is an infinite loop and used in association with a break statement.</p>
-<pre class="r"><code>a = 1
-repeat { 
-  print(a) 
-  a = a+1 
-  if(a &gt; 4) break }</code></pre>
-<pre><code>## [1] 1
-## [1] 2
-## [1] 3
-## [1] 4</code></pre>
+<p>Make sure there is a way to exit out of a while loop. Otherwise, you can get stuck in an infinite loop. Below is an example of one.</p>
+<pre class="r"><code>i &lt;- 1
+while (i &lt; 10) {
+  print(i)
+}</code></pre>
 </div>
 <div id="break-statement" class="section level3">
 <h3>Break statement</h3>
 <p>A break statement is used in a loop to stop the iterations and flow the control outside of the loop.</p>
 <pre class="r"><code>x = 1:10 
- for (i in x){ 
-     if (i == 2){ 
-         break 
-     }
-     print(i)
- }</code></pre>
+for (i in x){ 
+  if (i == 2){ 
+    break 
+  }
+  print(i)
+}</code></pre>
 <pre><code>## [1] 1</code></pre>
 </div>
 <div id="next-statement" class="section level3">
 <h3>Next statement</h3>
 <p>Next statement enables to skip the current iteration of a loop without terminating it.</p>
-<pre class="r"><code>x = 1: 4 
- for (i in x) { 
-     if (i == 2){ 
-         next}
-     print(i)
- }</code></pre>
+<pre class="r"><code>x = 1:4 
+for (i in x) { 
+  if (i == 2){ 
+    next
+  }
+  print(i)
+}</code></pre>
 <pre><code>## [1] 1
 ## [1] 3
 ## [1] 4</code></pre>
@@ -367,7 +519,7 @@ repeat {
 </ul>
 <pre class="r"><code># Addition 
 add &lt;- function(a, b) {
-    return(a + b)
+  return(a + b)
 }
 
 add(2,5)</code></pre>
@@ -375,6 +527,28 @@ add(2,5)</code></pre>
 </div>
 <div id="examples-from-gambling-dataset" class="section level4">
 <h4>Examples from gambling dataset</h4>
+<pre class="r"><code># read in the gambling data from Day 1
+gambling.data &lt;- read.csv(file = &quot;http://data.justice.qld.gov.au/JSD/OLGR/20170817_OLGR_LGA-EGM-data.csv&quot;,
+                 header = TRUE,
+                 sep = &quot;,&quot;,
+                 stringsAsFactors = FALSE)
+
+# rename columns
+names(gambling.data)[2] &lt;- &quot;Local.Govt.Area&quot;
+names(gambling.data)[7] &lt;- &quot;Player.Money.Lost&quot;
+
+#Add a day of month (1st) to each date string
+date.string &lt;- paste0( &quot;1 &quot; , gambling.data$Month.Year )
+
+#Convert to POSIXlt, a date-time format
+strptime( date.string , format = &quot;%d %B %Y&quot; ) -&gt; gambling.data$Date
+
+# subset to Brisbane only 
+brisbane.only &lt;- gambling.data[gambling.data$Local.Govt.Area==&quot;BRISBANE&quot;,]
+row.indicies &lt;- (brisbane.only$Date&gt;=&quot;2010-01-01 AEST&quot; &amp;
+                 brisbane.only$Date&lt;=&quot;2010-12-31 AEST&quot;)
+
+(brisbane.2010.data &lt;- brisbane.only[row.indicies,])</code></pre>
 <pre><code>##          Month.Year Local.Govt.Area Approved.Sites Operational.Sites
 ## 3635   January 2010        BRISBANE            227               220
 ## 3690  February 2010        BRISBANE            227               220

@@ -55,11 +55,11 @@ else
 
 ```
 
-For those interested, Hadley Wickham has published a style guide for R http://adv-r.had.co.nz/Style.html. 
+Hadley Wickham has published a style guide for R http://adv-r.had.co.nz/Style.html. 
 
 "An opening curly brace should never go on its own line and should always be followed by a new line. A closing curly brace should always go on its own line, unless it’s followed by else. Always indent the code inside curly braces.""
 
-### If..else statements with better styling
+#### If..else statements with better styling
 ```{r, eval=FALSE, message=FALSE}
 
 if (condition) {
@@ -70,7 +70,7 @@ if (condition) {
 
 ```
 
-For example:
+An example of if..else statement:
 
 ```{r}
 x <- 1
@@ -90,7 +90,7 @@ if (condition1) {
 } else if (condition2) {
   # do something else
 } else {
-  # do something differnent
+  # do something different
 }
 
 ```
@@ -106,6 +106,15 @@ if (x > 1) {
 } else {
   print("x is equal to 1")
 } 
+```
+
+
+#### Quiz
+Write a set of if..else statements that will test a variable "mhi5_score". Print out "depression" if it is less than 52 and "control" if it is greater than or equal to 52
+```{r}
+mhi5_score <- 45
+# put your if else statements here
+
 ```
 
 
@@ -128,16 +137,97 @@ for (i in 1:4) {
   print(x[i])
 }
 
-for (i in seq(x)) {
-  print(x[i])
-}
 ```
 
 For short-hand coding, we can put the contents of the loop on the same line as the for-statement
 
 ```{r}
 for (i in 1:4) print(x[i])
+``` 
+
+We can also simply print out each element of our vector using a for-loop to traverse it
+
+```{r}
+for (i in x) print(i)
 ```
+
+
+### For loop example with the gambling dataset
+
+We've seen that we can use for loops for vectors. We can also use for loops for data frames
+
+```{r}
+# read in the gambling data from Day 1
+gambling.data <- read.csv(file = "http://data.justice.qld.gov.au/JSD/OLGR/20170817_OLGR_LGA-EGM-data.csv",
+                 header = TRUE,
+                 sep = ",",
+                 stringsAsFactors = FALSE)
+
+# rename columns
+names(gambling.data)[2] <- "Local.Govt.Area"
+names(gambling.data)[7] <- "Player.Money.Lost"
+
+#Add a day of month (1st) to each date string
+date.string <- paste0( "1 " , gambling.data$Month.Year )
+
+#Convert to POSIXlt, a date-time format
+strptime( date.string , format = "%d %B %Y" ) -> gambling.data$Date
+
+# subset to Brisbane only 
+brisbane.only <- gambling.data[gambling.data$Local.Govt.Area=="BRISBANE",]
+row.indicies <- (brisbane.only$Date>="2010-01-01 AEST" &
+                 brisbane.only$Date<="2010-12-31 AEST")
+
+(brisbane.2010.data <- brisbane.only[row.indicies,])
+```
+
+We can traverse across each row of the data frame
+
+```{r}
+# for each row in brisbane.2010.data, print the player money lost
+numrows <- nrow(brisbane.2010.data)
+for (i in 1:numrows) {
+  print(brisbane.2010.data[i, "Player.Money.Lost"])
+}
+```
+
+
+Or across each column of the data frame
+
+```{r, message=FALSE}
+# for each column in brisbane.2010.data, print the data type using the class() function
+numcols <- ncol(brisbane.2010.data)
+for (i in 1:numcols) {
+  columndata <- brisbane.2010.data[, i]
+  print(class(columndata))
+}
+```
+
+#### For loops and if statements
+We can incorporate our knowledge of if..else statements with for-loops. 
+
+```{r}
+# for each row, print those where the Player.Money.Lost is greater than 32 million
+numrows <- nrow(brisbane.2010.data)
+for (i in 1:numrows) {
+  if (brisbane.2010.data[i, "Player.Money.Lost"] > 32000000){
+    print(brisbane.2010.data[i, "Player.Money.Lost"])
+  }
+}
+```
+
+
+#### Quiz
+For each row of the brisbane.2010.data dataframe, write code to test whether the Player.Money.Lost value is greater than 32 million. If so, print "Greater than 32 million". Otherwise, print "Not greater than 32 million"
+
+```{r}
+numrows <- nrow(brisbane.2010.data)
+for (i in 1:numrows) {
+  # write your code here 
+}
+```
+
+
 
 ### While loop
 ```{r}
@@ -148,19 +238,13 @@ while (i < 10) {
 }
 ```
 
-Make sure there is a way to exit out of a while loop. Otherwise, you can get stuck in an infinite loop. 
+Make sure there is a way to exit out of a while loop. Otherwise, you can get stuck in an infinite loop. Below is an example of one.
 
-### Repeat Loops
-
-The repeat loop is an infinite loop and is used in association with a break statement.
-
-```{r}
-a = 1
-repeat { 
-  print(a) 
-  a = a+1 
-  if(a > 4) break }
-
+```{r, eval=FALSE, message=FALSE}
+i <- 1
+while (i < 10) {
+  print(i)
+}
 ```
 
 ### Break statement
@@ -217,14 +301,15 @@ add(2,5)
 
 #### Examples from gambling dataset
 
-```{r,echo=FALSE}
+```{r}
+# read in the gambling data from Day 1
 gambling.data <- read.csv(file = "http://data.justice.qld.gov.au/JSD/OLGR/20170817_OLGR_LGA-EGM-data.csv",
                  header = TRUE,
                  sep = ",",
                  stringsAsFactors = FALSE)
 
+# rename columns
 names(gambling.data)[2] <- "Local.Govt.Area"
-
 names(gambling.data)[7] <- "Player.Money.Lost"
 
 #Add a day of month (1st) to each date string
@@ -233,11 +318,12 @@ date.string <- paste0( "1 " , gambling.data$Month.Year )
 #Convert to POSIXlt, a date-time format
 strptime( date.string , format = "%d %B %Y" ) -> gambling.data$Date
 
-brisbane.only<-gambling.data[gambling.data$Local.Govt.Area=="BRISBANE",]
-row.indicies<-(brisbane.only$Date>="2010-01-01 AEST" &
+# subset to Brisbane only 
+brisbane.only <- gambling.data[gambling.data$Local.Govt.Area=="BRISBANE",]
+row.indicies <- (brisbane.only$Date>="2010-01-01 AEST" &
                  brisbane.only$Date<="2010-12-31 AEST")
 
-(brisbane.2010.data<-brisbane.only[row.indicies,])
+(brisbane.2010.data <- brisbane.only[row.indicies,])
 ```
 
 ##### Example 1 : Iterate(Loop) through brisbane.2010.data and sum up the Player.Money.Lost
