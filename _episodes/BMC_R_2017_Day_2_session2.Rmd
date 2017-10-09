@@ -61,6 +61,16 @@ Grammar Of Graphics independently specifies plot building blocks and combine the
 * graph theory type of graphs (node/edges; see "igraph" package)
 * interactive graphics (see "ggvis" package)
 
+### Key components
+
+Every ggplot2 plot has three key components:
+
+1. data,
+2. A set of aesthetic mappings between variables in the data and visual
+properties, and
+3. At least one layer which describes how to render each observation. Layers
+are usually created with a geom function.
+
 Website : http://ggplot2.org
 
 
@@ -134,16 +144,6 @@ names(gambling.avg.LGA)[names(gambling.avg.LGA) == 'x'] <- 'Avg.Money.Lost'
 
 ```
 
-### Key components
-
-Every ggplot2 plot has three key components:
-
-1. data,
-2. A set of aesthetic mappings between variables in the data and visual
-properties, and
-3. At least one layer which describes how to render each observation. Layers
-are usually created with a geom function.
-
 Let's take a look at a simple example of scatter plot.
 
 ### Basic Scatter plot 
@@ -160,14 +160,14 @@ geom_point()
 
 This produces a scatterplot defined by:
 
-1. Data: brisbane.only
+1. Data: gambling.avg.year
 2. Aesthetic mapping: Date mapped to x position, Operational.Sites to y position (aes() function).
 3. Layer: points (geom_point() function)
 
 ### Scatter plot with colour added
 
 ```{r}
-# Scatter plot of Year and operational sites (Brisbane dataset) with Date formatted, x label & y label.
+# Scatter plot of Year and operational sites with colour attribute for points.
 
 ggplot(gambling.avg.year,
        aes(x=Year,
