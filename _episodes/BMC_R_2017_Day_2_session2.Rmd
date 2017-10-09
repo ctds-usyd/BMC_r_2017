@@ -1,0 +1,249 @@
+---
+title: "The Brain & Mind Centre"
+author: "Sydney Informatics Hub"
+subtitle: Day 2
+output:
+  html_document:
+    hightlight: github
+    theme: lumen
+    toc: yes
+    toc_float:
+      collapsed: no
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      cache = FALSE)
+```
+
+```{r installation, message=FALSE}
+#install.packages("ggplot2")
+library(ggplot2)
+library(scales)
+```
+
+## Introduction to ggplot2
+
+* ggplot2 is a data visualization package for the statistical programming language R. 
+* It was created by Hadley Wickham in 2005 (while he was a graduate student at Iowa state). 
+* It is based on Grammar of Graphics (Leland Wilkinson 2005), is composed of a set of independent components that can be composed in many different ways.
+* Other data visualization packages in R include base and lattice. 
+
+### What Is The Grammar Of Graphics?
+
+Grammar of English language has components like verbs, nouns, adjectives, articles, etc to form a sentence. 
+
+Grammar Of Graphics independently specifies plot building blocks and combine them to create just about any kind of graphical display you want. Building blocks of a graph include:
+
+* data
+* aesthetic mapping
+* geometric object
+* statistical transformations
+* scales
+* coordinate system
+* position adjustments
+* faceting
+
+#### Advantages of ggplot2
+
+* consistent underlying grammar of graphics (Wilkinson, 2005)
+* plot specification at a high level of abstraction
+* very flexible
+* theme system for polishing plot appearance
+* mature and complete graphics system
+* many users, active mailing list
+
+#### What ggplot2 cannot do? 
+
+* 3D visualizations (see the "rgl" package) 
+* graph theory type of graphs (node/edges; see "igraph" package)
+* interactive graphics (see "ggvis" package)
+
+### Key components
+
+Every ggplot2 plot has three key components:
+
+1. data,
+2. A set of aesthetic mappings between variables in the data and visual
+properties, and
+3. At least one layer which describes how to render each observation. Layers
+are usually created with a geom function.
+
+Website : http://ggplot2.org
+
+
+```{r,echo=FALSE}
+gambling.data <- read.csv(file = "http://data.justice.qld.gov.au/JSD/OLGR/20170817_OLGR_LGA-EGM-data.csv",
+                 header = TRUE,
+                 sep = ",",
+                 stringsAsFactors = FALSE)
+
+class(gambling.data)
+
+names(gambling.data) <- c("Month.Year",
+                 "Local.Govt.Area",
+                 "Approved.Sites",
+                 "Operational.Sites",
+                 "Approved.EGMs", 
+                 "Operational.EGMs", 
+                 "Player.Money.Lost")
+
+
+```
+
+
+```{r,echo=FALSE}
+#Add a day of month (1st)
+date.string<-paste0("1 ",gambling.data$Month.Year)
+
+#Convert to POSIXlt
+strptime(date.string, format = "%d %B %Y")->gambling.data$Date
+
+# Add column for year
+gambling.data$Year <- as.numeric (format(gambling.data$Date,"%Y"))
+
+# Add column for month
+gambling.data$Month <- as.numeric (format(gambling.data$Date,"%m")) 
+
+```
+
+```{r,echo=FALSE}
+# Subset LGA
+brisbane.only<- gambling.data[gambling.data$Local.Govt.Area=="BRISBANE",]
+
+# Subset by Year & Month
+Subset.July2017<-gambling.data[gambling.data$Month.Year=="July 2017",]
+
+
+```
+
+#### Aggregate gambling.data by Local.Govt.Area & by Year
+
+```{r}
+
+gambling.data <- na.omit(gambling.data)
+
+# Aggregate dataset by taking mean of Player.Money.Lost By each Year
+
+gambling.avg.year <- aggregate(gambling.data$Player.Money.Lost, 
+                         by=list(Year = gambling.data$Year), 
+                         FUN=mean,
+                         na.rm = TRUE)
+names(gambling.avg.year)[names(gambling.avg.year) == 'x'] <- 'Avg.Money.Lost'
+
+# Aggregate dataset by taking mean of Player.Money.Lost By Local.Govt.Area
+
+gambling.avg.LGA <- aggregate(gambling.data$Player.Money.Lost, 
+                         by=list(Local.Govt.Area = gambling.data$Local.Govt.Area), 
+                         FUN=mean,
+                         na.rm = TRUE)
+
+names(gambling.avg.LGA)[names(gambling.avg.LGA) == 'x'] <- 'Avg.Money.Lost'
+
+```
+
+Let's take a look at a simple example of scatter plot.
+
+### Basic Scatter plot 
+
+```{r}
+# Scatter plot of Year and operational sites 
+ggplot(gambling.avg.year,
+       aes(x=Year,
+           y=Avg.Money.Lost
+           ))+
+geom_point() 
+
+```
+
+This produces a scatterplot defined by:
+
+1. Data: gambling.avg.year
+2. Aesthetic mapping: Date mapped to x position, Operational.Sites to y position (aes() function).
+3. Layer: points (geom_point() function)
+
+### Scatter plot with colour added
+
+```{r}
+# Scatter plot of Year and operational sites with colour attribute for points.
+
+ggplot(gambling.avg.year,
+       aes(x=Year,
+           y=Avg.Money.Lost
+           ))+
+geom_point(colour="red") 
+
+```
+
+
+### Scatter plot with smoothing layer
+
+Now we add a smoothing layer using geom_smooth(method='lm'). Since the method is set as lm (short for linear model), it draws the line of best fit.
+The line of best fit is in blue.
+
+```{r}
+# Scatter plot of Year and operational sites (with) geom_smooth()
+ggplot(gambling.avg.year,
+       aes(x=Year,
+           y=Avg.Money.Lost
+           ))+
+geom_point(colour="red") +
+geom_smooth(method='lm') 
+```
+
+### Barplot
+
+Let's create a barplot with average money lost for each Local.Govt.Area using whole gambling dataset.
+
+```{r}
+# Barplot of money lost(average) for each LGA
+ggplot(gambling.avg.LGA,
+       aes(x=Local.Govt.Area,
+           y=Avg.Money.Lost
+           ))+
+geom_bar(stat="identity") +
+theme(axis.text.x = element_text(angle=90,hjust=1)) 
+
+```
+
+
+### Barplot with ordering
+
+```{r}
+ggplot(gambling.avg.LGA,
+       aes(x=reorder(Local.Govt.Area,-Avg.Money.Lost),
+           y=Avg.Money.Lost
+          ))+
+geom_bar(stat="identity", fill="blue") + 
+theme(axis.text.x = element_text(angle=90,hjust=1)) +
+scale_y_continuous(labels = dollar) + 
+xlab("Local Government Area") +
+ylab("Total Money lost")
+```
+
+### Box plot
+
+```{r}
+# Box plots for whole dataset by LGA
+
+ggplot((gambling.data), aes(x = reorder(Local.Govt.Area, -Player.Money.Lost, FUN = median), y = Player.Money.Lost)) +
+        geom_boxplot() +
+        scale_y_continuous(labels = dollar) + 
+        theme(axis.text.x = element_text(angle=90,hjust=1)) +
+  xlab("Local Government Area") +
+  ylab("Total Money lost")
+
+```
+
+
+Adapted from :
+
+http://ggplot2.org (Book)
+
+http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html
+
+
+
+
