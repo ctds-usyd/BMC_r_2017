@@ -335,22 +335,22 @@ add(2,5)
 total.money.lost <- 0
 
 for (i in 1:nrow(brisbane.2010.data)) {
-  total.money.lost = total.money.lost + brisbane.2010.data[i, "Player.Money.Lost"]
+  total.money.lost <- total.money.lost + brisbane.2010.data[i, "Player.Money.Lost"]
 }
 
 print(total.money.lost)
 ```
 
 
-#### Example 2 : Create a function to sum up money lost by passing vector of player.money.lost values
+#### Example 2 : Create a function to sum up the Player.Money.Lost column from any data frame
 
 ```{r}
 sumMoneyLost <- function(some.gambling.dataframe){
   
-  total.money.lost = 0
+  total.money.lost <- 0
 
   for (i in 1:nrow(some.gambling.dataframe)) {
-    total.money.lost = total.money.lost + some.gambling.dataframe[i, "Player.Money.Lost"]
+    total.money.lost <- total.money.lost + some.gambling.dataframe[i, "Player.Money.Lost"]
   }
   return(total.money.lost)
 }

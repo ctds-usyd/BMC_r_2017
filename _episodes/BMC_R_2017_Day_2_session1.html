@@ -554,20 +554,20 @@ add(2,5)</code></pre>
 <pre class="r"><code>total.money.lost &lt;- 0
 
 for (i in 1:nrow(brisbane.2010.data)) {
-  total.money.lost = total.money.lost + brisbane.2010.data[i, &quot;Player.Money.Lost&quot;]
+  total.money.lost &lt;- total.money.lost + brisbane.2010.data[i, &quot;Player.Money.Lost&quot;]
 }
 
 print(total.money.lost)</code></pre>
 <pre><code>## [1] 402228128</code></pre>
 </div>
-<div id="example-2-create-a-function-to-sum-up-money-lost-by-passing-vector-of-player.money.lost-values" class="section level4">
-<h4>Example 2 : Create a function to sum up money lost by passing vector of player.money.lost values</h4>
+<div id="example-2-create-a-function-to-sum-up-the-player.money.lost-column-from-any-data-frame" class="section level4">
+<h4>Example 2 : Create a function to sum up the Player.Money.Lost column from any data frame</h4>
 <pre class="r"><code>sumMoneyLost &lt;- function(some.gambling.dataframe){
   
-  total.money.lost = 0
+  total.money.lost &lt;- 0
 
   for (i in 1:nrow(some.gambling.dataframe)) {
-    total.money.lost = total.money.lost + some.gambling.dataframe[i, &quot;Player.Money.Lost&quot;]
+    total.money.lost &lt;- total.money.lost + some.gambling.dataframe[i, &quot;Player.Money.Lost&quot;]
   }
   return(total.money.lost)
 }
