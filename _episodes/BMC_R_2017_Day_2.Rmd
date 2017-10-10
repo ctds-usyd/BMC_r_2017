@@ -399,7 +399,7 @@ https://www.r-bloggers.com/control-structures-loops-in-r/
 * It is based on Grammar of Graphics (Leland Wilkinson 2005), is composed of a set of independent components that can be composed in many different ways.
 * Other data visualization packages in R include base and lattice. 
 
-### What Is The Grammar Of Graphics?
+### Grammar Of Graphics
 
 Grammar of English language has components like verbs, nouns, adjectives, articles, etc to form a sentence. 
 
