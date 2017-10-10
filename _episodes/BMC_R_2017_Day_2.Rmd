@@ -1,0 +1,621 @@
+---
+title: "The Brain & Mind Centre"
+author: "Sydney Informatics Hub"
+subtitle: Day 2
+output:
+  html_document:
+    hightlight: github
+    theme: lumen
+    toc: yes
+    toc_float:
+      collapsed: no
+  pdf_document:
+    toc: yes
+---
+
+<!-- https://stackoverflow.com/questions/46201753/rmarkdown-indentation-of-toc-items-in-html-output -->
+<script>
+$(document).ready(function() {
+  $items = $('div#TOC li');
+  $items.each(function(idx) {
+    num_ul = $(this).parentsUntil('#TOC').length;
+    $(this).css({'text-indent': num_ul * 10, 'padding-left': 0});
+  });
+
+});
+</script>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      cache = FALSE)
+```
+
+# Controls & Loops
+
+These allow you to control the flow of execution of a script typically inside of a function. Common ones include:
+
+* if, else
+* for
+* while
+* repeat
+* break
+* next
+* function
+
+## Control statements
+
+### If statement
+```{r, eval=FALSE, message=FALSE}
+
+if (condition)
+{
+  # do something
+} 
+```
+
+Sometimes, we want to do something even if the if-statement returns FALSE. In this case, we use an else statement.
+
+### If else statement
+```{r, eval=FALSE, message=FALSE}
+
+if (condition)
+{
+  # do something
+} 
+else 
+{
+  # do something else
+}
+
+```
+
+Hadley Wickham has published a style guide for R http://adv-r.had.co.nz/Style.html. 
+
+"An opening curly brace should never go on its own line and should always be followed by a new line. A closing curly brace should always go on its own line, unless it’s followed by else. Always indent the code inside curly braces.""
+
+#### If else statements with better styling
+```{r, eval=FALSE, message=FALSE}
+
+if (condition) {
+  # do something
+} else {
+  # do something else
+}
+
+```
+
+An example of if..else statement:
+
+```{r}
+x <- 1
+if (x > 1) {
+  print("x is greater than 1")
+} else {
+  print("x is less than or equal to 1")
+} 
+```
+
+
+### If, else if and else statements
+```{r, eval=FALSE, message=FALSE}
+
+if (condition1) {
+  # do something
+} else if (condition2) {
+  # do something else
+} else {
+  # do something different
+}
+
+```
+
+For example:
+
+```{r}
+x <- 1
+if (x > 1) {
+  print("x is greater than 1")
+} else if ( x < 1) {
+  print ("x is less than 1")
+} else {
+  print("x is equal to 1")
+} 
+```
+
+
+#### Quiz
+Write a set of if..else statements that will test a variable "mhi5_score". Print out "depression" if it is less than 52 and "control" if it is greater than or equal to 52
+```{r}
+mhi5_score <- 45
+# put your if else statements here
+
+```
+
+
+## Loops
+
+### For loops
+
+A for-loop works on an iterable variable and assigns successive values till the end of a sequence.
+
+```{r}
+for (i in 1:10) {
+  print(i)
+}
+
+```
+
+```{r}
+x <- c("apples", "oranges", "bananas", "strawberries")
+
+for (i in 1:4) {
+  print(x[i])
+}
+
+```
+
+For short-hand coding, we can put the contents of the loop on the same line as the for-statement
+
+```{r}
+for (i in 1:4) print(x[i])
+``` 
+
+We can also simply print out each element of our vector using a for-loop to traverse it
+
+```{r}
+for (i in x) print(i)
+```
+
+
+### For loop examples
+
+We've seen that we can use for loops for vectors. We can also use for loops for data frames
+
+```{r}
+# read in the gambling data from Day 1
+gambling.data <- read.csv(file = "http://data.justice.qld.gov.au/JSD/OLGR/20170817_OLGR_LGA-EGM-data.csv",
+                 header = TRUE,
+                 sep = ",",
+                 stringsAsFactors = FALSE)
+
+# rename columns
+names(gambling.data)[2] <- "Local.Govt.Area"
+names(gambling.data)[7] <- "Player.Money.Lost"
+
+#Add a day of month (1st) to each date string
+date.string <- paste0( "1 " , gambling.data$Month.Year )
+
+#Convert to POSIXlt, a date-time format
+strptime( date.string , format = "%d %B %Y" ) -> gambling.data$Date
+
+# subset to Brisbane only 
+brisbane.only <- gambling.data[gambling.data$Local.Govt.Area=="BRISBANE",]
+row.indicies <- (brisbane.only$Date>="2010-01-01 AEST" &
+                 brisbane.only$Date<="2010-12-31 AEST")
+
+(brisbane.2010.data <- brisbane.only[row.indicies,])
+```
+
+We can traverse across each row of the data frame
+
+```{r}
+# for each row in brisbane.2010.data, print the player money lost
+numrows <- nrow(brisbane.2010.data)
+for (i in 1:numrows) {
+  print(brisbane.2010.data[i, "Player.Money.Lost"])
+}
+```
+
+
+Or across each column of the data frame
+
+```{r, message=FALSE}
+# for each column in brisbane.2010.data, print the data type using the class() function
+numcols <- ncol(brisbane.2010.data)
+for (i in 1:numcols) {
+  columndata <- brisbane.2010.data[, i]
+  print(class(columndata))
+}
+```
+
+
+#### For loops and if statements
+We can incorporate our knowledge of if..else statements with for-loops. 
+
+```{r}
+# for each row, print those where the Player.Money.Lost is greater than 32 million
+numrows <- nrow(brisbane.2010.data)
+for (i in 1:numrows) {
+  if (brisbane.2010.data[i, "Player.Money.Lost"] > 32000000){
+    print(brisbane.2010.data[i, "Player.Money.Lost"])
+  }
+}
+```
+
+
+#### Quiz
+For each row of the brisbane.2010.data dataframe, write code to test whether the Player.Money.Lost value is greater than 32 million. If so, print "Greater than 32 million". Otherwise, print "Not greater than 32 million"
+
+```{r}
+numrows <- nrow(brisbane.2010.data)
+for (i in 1:numrows) {
+  # write your code here 
+}
+```
+
+
+
+
+### While loop
+```{r}
+i <- 1
+while (i < 10) {
+  print(i)
+  i <- i + 1
+}
+```
+
+Make sure there is a way to exit out of a while loop. Otherwise, you can get stuck in an infinite loop. Below is an example of one.
+
+```{r, eval=FALSE, message=FALSE}
+i <- 1
+while (i < 10) {
+  print(i)
+}
+```
+
+### Break statement
+
+A break statement is used in a loop to stop the iterations and flow the control outside of the loop.
+
+```{r}
+x = 1:10 
+for (i in x){ 
+  if (i == 2){ 
+    break 
+  }
+  print(i)
+}
+```
+
+### Next statement
+
+Next statement enables to skip the current iteration of a loop without terminating it.
+
+```{r}
+x = 1:4 
+for (i in x) { 
+  if (i == 2){ 
+    next
+  }
+  print(i)
+}
+```
+
+## User-defined functions
+
+If you have to repeat the same few lines of code more than once, then you really need to write a function. Functions are a fundamental building block of R. You use them all the time in R and it's not that much harder to string functions together (or write entirely new ones from scratch) to do more.
+
+* R functions are objects just like anything else.
+* By default, R function arguments are lazy - they're only evaluated if they're actually used:
+* Every call on a R object is almost always a function call.
+
+#### Basic components of a function
+
+* The body(), the code inside the function.
+* The formals(), the "formal" argument list, which controls how you can call the function.
+* The environment() which determines how variables referred to inside the function are found.
+* args() to list arguments.
+
+```{r}
+myFunction <- function(parameter1, parameter2) {
+  # do something with parameter1 and parameter2
+  value <- parameter1 + parameter2
+  return(value)
+}
+```
+
+Functions should have good descriptive names
+
+```{r}
+# Create a function to perform addition
+add <- function(num1, num2) {
+  return(num1 + num2)
+}
+
+# Call the add function
+add(2,5)
+```
+
+
+#### Example 1 : Loop through brisbane.2010.data and sum up the Player.Money.Lost
+
+```{r}
+total.money.lost <- 0
+
+for (i in 1:nrow(brisbane.2010.data)) {
+  total.money.lost <- total.money.lost + brisbane.2010.data[i, "Player.Money.Lost"]
+}
+
+print(total.money.lost)
+```
+
+
+#### Example 2 : Create a function to sum up the Player.Money.Lost column from any data frame
+
+```{r}
+sumMoneyLost <- function(some.gambling.dataframe){
+  
+  total.money.lost <- 0
+
+  for (i in 1:nrow(some.gambling.dataframe)) {
+    total.money.lost <- total.money.lost + some.gambling.dataframe[i, "Player.Money.Lost"]
+  }
+  return(total.money.lost)
+}
+
+# Call function sum.money.lost
+sumMoneyLost(brisbane.2010.data)
+
+```
+
+With user-defined functions, you won't need to repeat your code over and over again. You can just call it for another dataset
+
+```{r}
+sumMoneyLost(brisbane.only)
+```
+
+
+If, however, there is already a function to perform what you need, save time and use that instead.
+
+```{r}
+# This will return NA
+sumMoneyLost(gambling.data)
+
+# We will use the sum() function instead which has a na.rm option
+sum(gambling.data$Player.Money.Lost, na.rm = TRUE)
+```
+
+
+
+
+
+
+Adapted from :
+
+https://ramnathv.github.io/pycon2014-r/learn/controls.html
+
+https://www.r-bloggers.com/control-structures-loops-in-r/
+
+
+
+# Graphics
+
+## Introduction to ggplot2
+
+* ggplot2 is a data visualization package for the statistical programming language R. 
+* It was created by Hadley Wickham in 2005 (while he was a graduate student at Iowa state). 
+* It is based on Grammar of Graphics (Leland Wilkinson 2005), is composed of a set of independent components that can be composed in many different ways.
+* Other data visualization packages in R include base and lattice. 
+
+### What Is The Grammar Of Graphics?
+
+Grammar of English language has components like verbs, nouns, adjectives, articles, etc to form a sentence. 
+
+Grammar Of Graphics independently specifies plot building blocks and combine them to create just about any kind of graphical display you want. Building blocks of a graph include:
+
+* data
+* aesthetic mapping
+* geometric object
+* statistical transformations
+* scales
+* coordinate system
+* position adjustments
+* faceting
+
+#### Advantages of ggplot2
+
+* consistent underlying grammar of graphics (Wilkinson, 2005)
+* plot specification at a high level of abstraction
+* very flexible
+* theme system for polishing plot appearance
+* mature and complete graphics system
+* many users, active mailing list
+
+#### What ggplot2 cannot do? 
+
+* 3D visualizations (see the "rgl" package) 
+* graph theory type of graphs (node/edges; see "igraph" package)
+* interactive graphics (see "ggvis" package)
+
+### Key components
+
+Every ggplot2 plot has three key components:
+
+1. data,
+2. A set of aesthetic mappings between variables in the data and visual
+properties, and
+3. At least one layer which describes how to render each observation. Layers
+are usually created with a geom function.
+
+Website : http://ggplot2.org
+
+```{r installation, message=FALSE}
+library(ggplot2)
+library(scales)
+```
+
+```{r,echo=FALSE}
+gambling.data <- read.csv(file = "http://data.justice.qld.gov.au/JSD/OLGR/20170817_OLGR_LGA-EGM-data.csv",
+                 header = TRUE,
+                 sep = ",",
+                 stringsAsFactors = FALSE)
+
+class(gambling.data)
+
+names(gambling.data) <- c("Month.Year",
+                 "Local.Govt.Area",
+                 "Approved.Sites",
+                 "Operational.Sites",
+                 "Approved.EGMs", 
+                 "Operational.EGMs", 
+                 "Player.Money.Lost")
+
+
+```
+
+
+```{r,echo=FALSE}
+#Add a day of month (1st)
+date.string<-paste0("1 ",gambling.data$Month.Year)
+
+#Convert to POSIXlt
+strptime(date.string, format = "%d %B %Y")->gambling.data$Date
+
+# Add column for year
+gambling.data$Year <- as.numeric (format(gambling.data$Date,"%Y"))
+
+# Add column for month
+gambling.data$Month <- as.numeric (format(gambling.data$Date,"%m")) 
+
+```
+
+```{r,echo=FALSE}
+# Subset LGA
+brisbane.only<- gambling.data[gambling.data$Local.Govt.Area=="BRISBANE",]
+
+# Subset by Year & Month
+Subset.July2017<-gambling.data[gambling.data$Month.Year=="July 2017",]
+
+
+```
+
+## Create Aggregate Sets
+
+Aggregate gambling.data by Local.Govt.Area & by Year
+
+```{r}
+
+gambling.data <- na.omit(gambling.data)
+
+# Aggregate dataset by taking mean of Player.Money.Lost By each Year
+
+gambling.avg.year <- aggregate(gambling.data$Player.Money.Lost, 
+                         by=list(Year = gambling.data$Year), 
+                         FUN=mean,
+                         na.rm = TRUE)
+names(gambling.avg.year)[names(gambling.avg.year) == 'x'] <- 'Avg.Money.Lost'
+
+# Aggregate dataset by taking mean of Player.Money.Lost By Local.Govt.Area
+
+gambling.avg.LGA <- aggregate(gambling.data$Player.Money.Lost, 
+                         by=list(Local.Govt.Area = gambling.data$Local.Govt.Area), 
+                         FUN=mean,
+                         na.rm = TRUE)
+
+names(gambling.avg.LGA)[names(gambling.avg.LGA) == 'x'] <- 'Avg.Money.Lost'
+
+```
+
+Let's take a look at a simple example of scatter plot.
+
+## Scatter plot 
+
+## Basic Scatter plot 
+
+```{r}
+# Scatter plot of Year and operational sites 
+ggplot(gambling.avg.year,
+       aes(x=Year,
+           y=Avg.Money.Lost
+           )) +
+  geom_point() 
+
+```
+
+This produces a scatterplot defined by:
+
+1. Data: gambling.avg.year
+2. Aesthetic mapping: Date mapped to x position, Operational.Sites to y position (aes() function).
+3. Layer: points (geom_point() function)
+
+## Scatter plot with colour added
+
+```{r}
+# Scatter plot of Year and operational sites with colour attribute for points.
+
+ggplot(gambling.avg.year,
+       aes(x=Year,
+           y=Avg.Money.Lost)) +
+  geom_point(colour="red") 
+
+```
+
+
+## Scatter plot with smoothing layer
+
+Now we add a smoothing layer using geom_smooth(method='lm'). Since the method is set as lm (short for linear model), it draws the line of best fit.
+The line of best fit is in blue.
+
+```{r}
+# Scatter plot of Year and operational sites (with) geom_smooth()
+ggplot(gambling.avg.year,
+       aes(x=Year,
+           y=Avg.Money.Lost)) +
+  geom_point(colour="red") +
+  geom_smooth(method='lm') 
+
+```
+
+## Barplot
+
+Let's create a barplot with average money lost for each Local.Govt.Area using whole gambling dataset.
+
+```{r}
+# Barplot of money lost(average) for each LGA
+ggplot(gambling.avg.LGA,
+       aes(x=Local.Govt.Area,
+           y=Avg.Money.Lost)) +
+geom_bar(stat="identity") +
+theme(axis.text.x = element_text(angle=90,hjust=1)) 
+
+```
+
+
+## Barplot with ordering
+
+```{r}
+ggplot(gambling.avg.LGA,
+       aes(x=reorder(Local.Govt.Area,-Avg.Money.Lost),
+           y=Avg.Money.Lost)) +
+      geom_bar(stat="identity", fill="blue") + 
+      theme(axis.text.x = element_text(angle=90,hjust=1)) +
+      scale_y_continuous(labels = dollar) + 
+      xlab("Local Government Area") +
+      ylab("Total Money lost")
+```
+
+## Box plot
+
+```{r}
+# Box plots for whole dataset by LGA
+
+ggplot(gambling.data, aes(x = reorder(Local.Govt.Area, -Player.Money.Lost, FUN = median), 
+                          y = Player.Money.Lost)) +
+        geom_boxplot() +
+        scale_y_continuous(labels = dollar) + 
+        theme(axis.text.x = element_text(angle=90,hjust=1)) +
+        xlab("Local Government Area") +
+        ylab("Total Money lost")
+
+```
+
+
+Adapted from :
+
+http://ggplot2.org (Book)
+
+http://tutorials.iq.harvard.edu/R/Rgraphics/Rgraphics.html
+
+
