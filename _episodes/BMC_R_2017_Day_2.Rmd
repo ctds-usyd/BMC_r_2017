@@ -518,9 +518,9 @@ names(gambling.avg.LGA)[names(gambling.avg.LGA) == 'x'] <- 'Avg.Money.Lost'
 
 ```
 
-Let's take a look at a simple example of scatter plot.
-
 ## Scatter plot 
+
+Let's take a look at a simple example of scatter plot.
 
 ## Basic Scatter plot 
 
@@ -540,7 +540,11 @@ This produces a scatterplot defined by:
 2. Aesthetic mapping: Date mapped to x position, Operational.Sites to y position (aes() function).
 3. Layer: points (geom_point() function)
 
-## Scatter plot with colour added
+## Scatter plot with colour, title
+
+* Here colour="red" represents colour of points
+
+* ggtitle() represents title of the plot
 
 ```{r}
 # Scatter plot of Year and operational sites with colour attribute for points.
@@ -548,7 +552,8 @@ This produces a scatterplot defined by:
 ggplot(gambling.avg.year,
        aes(x=Year,
            y=Avg.Money.Lost)) +
-  geom_point(colour="red") 
+  geom_point(colour="red") +
+  ggtitle("Year and Average Money Lost")
 
 ```
 
@@ -564,6 +569,7 @@ ggplot(gambling.avg.year,
        aes(x=Year,
            y=Avg.Money.Lost)) +
   geom_point(colour="red") +
+  ggtitle("Year and Average Money Lost")
   geom_smooth(method='lm') 
 
 ```
@@ -571,6 +577,18 @@ ggplot(gambling.avg.year,
 ## Barplot
 
 Let's create a barplot with average money lost for each Local.Govt.Area using whole gambling dataset.
+
+* Here, if you want the heights of the bars to represent values in the data, use stat="identity" and map a value to the y aesthetic.
+
+* theme() allows you to control apperance of all non-data components.
+
+* axis.title.x means x axis label
+
+* element_text means how text elements should be specified
+
+* angle=90 means x axis labels are rotated at 90 degrees.
+
+* hjust=1 means all x axis labels are aligned at top.
 
 ```{r}
 # Barplot of money lost(average) for each LGA
@@ -582,8 +600,13 @@ theme(axis.text.x = element_text(angle=90,hjust=1))
 
 ```
 
-
 ## Barplot with ordering
+
+* Here reorder() function is used to order first argument (Local.Govt.Area) based on second argument (Avg.Money.Lost). Negative sign in front of Avg.Money.Lost means ordering in decreasing values.
+
+* fill="blue" colours all bars in specified colour.
+
+* scale_y_continuous(labels = dollar) scales y axis values as continuous values with label as dollar sign.
 
 ```{r}
 ggplot(gambling.avg.LGA,
@@ -595,6 +618,7 @@ ggplot(gambling.avg.LGA,
       xlab("Local Government Area") +
       ylab("Total Money lost")
 ```
+
 
 ## Box plot
 
