@@ -635,6 +635,25 @@ ggplot(gambling.data, aes(x = reorder(Local.Govt.Area, -Player.Money.Lost, FUN =
 
 ```
 
+## Save plot
+
+```{r}
+png("myplot.png")
+
+myplot <- ggplot(gambling.avg.LGA,
+           aes(x=reorder(Local.Govt.Area,-Avg.Money.Lost),
+               y=Avg.Money.Lost)) +
+          geom_bar(stat="identity", fill="blue") + 
+          theme(axis.text.x = element_text(angle=90,hjust=1)) +
+          scale_y_continuous(labels = dollar) + 
+          xlab("Local Government Area") +
+          ylab("Total Money lost")
+
+print(myplot)
+
+dev.off()
+```
+
 
 Adapted from :
 
