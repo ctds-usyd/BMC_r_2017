@@ -1,0 +1,57 @@
+---
+title: "The Brain & Mind Centre"
+subtitle: "Day 3"
+author: "Sydney Informatics Hub"
+output:
+  html_document:
+    toc: true
+    toc_float:
+      collapsed: false
+    theme: lumen
+    hightlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      cache = FALSE)
+```
+
+## Introduction
+
+Hello this is day 3
+
+### Installation & Setup
+
+blah
+
+```{r installation, eval=FALSE, message=FALSE}
+LoadPackages <- function(x){ for( i in x ){ if( ! require( i , character.only = TRUE ) ){
+  install.packages( i , dependencies = TRUE , repos = "http://cran.us.r-project.org")
+  require( i , character.only = TRUE )}}}
+
+#  Then try/install packages...
+LoadPackages(c("tidyverse",
+               "ggplot2"))
+
+#options(max.print = 100)
+
+options(scipen = 999)
+set.seed(5)
+```
+
+## Statistical Techniques
+
+### Correllation plots
+
+```{r correltions}
+library(corrplot)
+M <- cor(mtcars)
+corrplot(M, method="circle")
+
+```
+
+More information in the [introduction to corrplot](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html)
+
+### PCA
+
+### Factor Analysis
