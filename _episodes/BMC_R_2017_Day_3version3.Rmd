@@ -16,7 +16,15 @@ output:
 knitr::opts_chunk$set(echo = TRUE,
                       cache = FALSE)
 ```
+
+
+## Introduction to statistics with R
+One of the really cool things about R, as opposed to other languages like python, matlab etc. is that it has such a wide user base in the statistics community and many packages that have been developed to analyze data with old and new statistical techniques and modelling. Most of these (but not all) are available on CRAN. Although we won't cover much beyond the basics today (which could just as easily be done in most other languages), more advanced things like bayesian techniques
+
+
 ### Preliminary Step: load example data
+
+![Pokies in Queensland](Las_Vegas_slot_machines.jpg)
 
 Read in (again) the gambling dataset:
 ```{r}
@@ -46,10 +54,6 @@ brisbane.only <- gambling.data[gambling.data$Local.Govt.Area=="BRISBANE",]
 #                 brisbane.only$Date<="2010-12-31 AEST")
 #brisbane.2010.data <- brisbane.only[row.indicies,]
 ```
-
-## Introduction to statistics with R
-One of the really cool things about R, as opposed to other languages like python, matlab etc. is that it has such a wide user base in the statistics community and many packages that have been developed to analyze data with old and new statistical techniques and modelling. Most of these (but not all) are available on CRAN. Although we won't cover much beyond the basics today (which could just as easily be done in most other languages), more advanced things like bayesian techniques
-
 
 ### Descriptive Statistics
 
@@ -293,7 +297,7 @@ Let's say that my "null model" is that the mean of many rolls will be 3.5, i.e.,
 mean(redDie)
 ```
 
-Is this data consistent with our hypothesis?
+Is this data consistent with our null hypothesis?
 
 ```{r}
 redDieTTest<-t.test(redDie, alternative="two.sided", mu = 3.5 ,conf.level=0.95)
@@ -322,7 +326,7 @@ redDieTTest
 I then rolled a blue die 10 times and got the following results from it:
 
 ```{r}
-blueDie<-c(5, 1, 4, 2, 3, 1, 5, 4, 4, 1)
+blueDie<-c(5, 1, 2, 2, 3, 1, 6, 2, 4, 1)
 ```
 
 Are the mean values for ten roll different between the red and blue die (within statistical uncertainty) ?
@@ -333,60 +337,46 @@ redblueDieTTest
 ```
 
 
-
-
-### Interpretation of the result
-The P-value (0.3622) is greater than the significance level 5% (1-0.95), so we conclude that the null hypothesis that the mean of this population is 9 is plausible.
-```{r}
-v <- rnorm(10,9, 6)
-t.test(v-0, alternative="two.sided", conf.level=0.95)  
-```
-
-### Homogeneous variances
-Before proceeding with the t-test, it is necessary to evaluate the sample variances of the two groups, using a Fisher’s F-test to verify the homoskedasticity (homogeneity of variances). In R you can do this in this way:
+### Testing for homogeneous variances
+Let's use a Fisher’s F-test to check that the rolls from the red die and the rolls from the blue die have simmilar variances (i.e. verify the homoskedasticity). In R you can do this in this way:
 
 ```{r}
-a <- c(175, 168, 168, 190, 156, 181, 182, 175, 174, 179)
-b <- c(185, 169, 173, 173, 188, 186, 175, 174, 179, 180)
-var.test(a,b)
+var.test(redDie,blueDie)
 ```
-We obtained p-value greater than 0.05, then we can assume that the two variances are homogeneous. Indeed we can compare the value of F obtained with the tabulated value of F for alpha = 0.05, degrees of freedom of numerator = 9, and degrees of freedom of denominator = 9, using the function qf(p, df.num, df.den):
-
-```{r}
-qf(0.95, 9, 9)
-```
-Note that the value of F computed is less than the tabulated value of F, which leads us to accept the null hypothesis of homogeneity of variances.
-NOTE: The F distribution has only one tail, so with a confidence level of 95%, p = 0.95. Conversely, the t-distribution has two tails, and in the R’s function qt(p, df) we insert a value p = 0975 when you’re testing a two-tailed alternative hypothesis.
-
-### Two-sample hypothesis test
-t-Test to compare the means of two groups under the assumption that both samples are random, independent, and come from normally distributed population with unknow but equal variances
-To solve this problem we must use to a Student’s t-test with two samples, assuming that the two samples are taken from populations that follow a Gaussian distribution(test called Wilcoxon-Mann-Whitney test). 
-For samples with Homogeneous variances (var.equal = TRUE),and independent samples (paired = FALSE: you can omit this because the function works on independent samples by default). 
-
-```{r}
-t.test(a,b, var.equal=TRUE, paired=FALSE)
-```
-
 
 ### Conducting Chi-Squared Test of Independence 
 The chi-square test of independence is a parametric method appropriate for testing independence between two categorical variables. 
-Dataset use here is survey, the Smoke column records the students smoking habit, while the Exer column records their exercise level. The allowed values in Smoke are "Heavy", "Regul" (regularly), "Occas" (occasionally) and "Never". As for Exer, they are "Freq" (frequently), "Some" and "None".
+  
+  
+![Smoking and Exercise](Quit-Smoking-With-Exercise1.jpg)  
+  
+We'll use a different dataset here as it is more illustrative of the concept. We have survey data from some students and we have asked them to report how heavy a smoker they are in the following categories:
+
+- "Heavy", 
+- "Regul" (regularly)
+- "Occas" (occasionally)
+- "Never" 
+
+as well as getting them to report how often they exercise (from the following options):
+
+- "Freq" (frequently)
+- "Some"
+- "None".
  
- 
- Question: test the hypothesis whether the students smoking habit is independent of their exercise level at 0.05 significance level (explore the relationship between variabele). 
- 
- First: Make a the contingency table of the two variables, the students smoking habit against the exercise level using the table function in R. The result is called the contingency table of the two variables.
+First we will make a the contingency table of the two variables, the students' smoking habit against the exercise level using the `table()` function in R. The result is called the contingency table of the two variables.
 
 ```{r}
-library(MASS)       # load the MASS package 
-tbl <- table(survey$Smoke, survey$Exer) 
-tbl<-tbl[c(2,3,4,1),]                 # the contingency table
-tbl
+library(MASS)       # load the MASS package, which contains the data 
+smokeExercise <- table(survey$Smoke, survey$Exer) # tabulate the entries in each combination of categories
+smokeExercise<-smokeExercise[c(2,3,4,1),c(2,3,1)]  #rearrange in the correct order
+
+# the contingency table
+smokeExercise
 ```
 See the relationship using barplot:
 
 ```{r}
-barplot(tbl, 
+barplot(smokeExercise, 
         beside=T, 
         legend=T,
         xlab = "Exercise",
@@ -394,37 +384,34 @@ barplot(tbl,
 
 ```
 
+We want to test the hypothesis that students smoking habit is independent of their exercise level. This would mean that each row is another sample from the distribution of exercise, and each column is another sample from the distribution of smoking, and this completely describes the system.
 
-Solution:We apply the chisq.test function to the contingency table tbl, and found the p-value.
+We test this by applying the `chisq.test()` function to the contingency table.
 ```{r}
-chisq.test(tbl) 
-
+chisq.test(smokeExercise) 
 ```
-Answer: As the p-value 0.4828 is greater than the .05 significance level, we do not reject the null hypothesis that the smoking habit is independent of the exercise level of the students.
+The p-value of 0.4828 indicates that the probability of generating data like what we see here, given that the null hypothesis is true (smoking and exercise level are independent random variables) is around 50%. So it seems plausible that they are independent, in absence of further information.
 
-Enhanced Solution
+
 The warning message found in the solution above is due to the small cell values in the contingency table. 
-To avoid such warning, we can combine the second and third columns of tbl, and save it in a new table named ctbl. Then we apply the chisq.test function against ctbl instead.
+To avoid such warning, we can combine the exercise answers for "None" and "Some" into a single category, and save it in a new table named reducedSmokeExercise. Then we apply the `chisq.test()` function against reducedSmokeExercise instead.
 
 ```{r}
-ctbl = cbind(tbl[,"Freq"], tbl[,"None"] + tbl[,"Some"]) 
-ctbl 
- EX_SM<- chisq.test(ctbl) 
- EX_SM
+reducedSmokeExercise = cbind(smokeExercise[,"Freq"], smokeExercise[,"None"] + smokeExercise[,"Some"]) 
+reducedSmokeExercise 
+
+chisq.test(reducedSmokeExercise) 
 ```
 
-```{r}
-attributes(EX_SM)
-```
 If the assumptions of Chi-square test are met we may consider using Fisher's Exact test that is non-parametric alternative to the Chi-Square test. 
 
 ```{r}
-fisher.test(tbl, conf.int=T, conf.level=0.99)
+fisher.test(smokeExercise, conf.int=T, conf.level=0.99)
 
 ```
 
 ### Anova: One-Way Analysis of Variance (ANOVA)
-Anova is a parameteric method appropriate for comparing the Means for the 2 or more in dependent populations. 
+Anova is a parameteric method appropriate for comparing the means of 2 or more independent populations. 
 ```{r}
 attach(InsectSprays)
  data(InsectSprays)
@@ -509,61 +496,5 @@ kruskal.test(count ~ spray, data=InsectSprays)
 We will reject the null hypothesis. 
 
 
-
-
-
-## Normal Distribution
-![Normal Distribution](Standard_deviation_diagram.png)
-
-A common distribution which is used in several statistical tests is a normal distribution. A standard normal distributed dataset is a dataset with standard deviation $\sigma=1$ and mean $\mu=0$, if you don't provide these arguments, then these values are assumed.
-
-`pnorm(q)` gives the integrated probability up to `q` standard deviations away from the mean
-```{r}
-pnorm(q = 2)
-pnorm(q = 0)
-```
-`qnorm(p)` gives the number of standard deviations away from the mean to get an integrated probability of `p`
-```{r}
-qnorm(p = 0.95)
-qnorm(p = 0.025, mean = 2, sd = 0.5)
-```
-`rnorm(n)` gives a vector of `n` random samples from the standard normal distribution (or you can specify a mean and a standard deviation)
-```{r}
-rnorm(n = 4, mean = 2, sd = 2)
-```
-Visual ways of checking the distribution of data are histogram, boxplots, and Q-Q plot.  
-
-
-### Q-Q Normal Plots
-When A and B have the same distribution the Q-Q plot is a 45 degree straight line.
-In many instances we need to know if a sample comes from a normal distribution, then the Q-Q plot of A against the standard normal distribution.
-NOTE: This will be a straight line if the distribution of A is normal of any mean and standard deviation. 
-There is an R function that does all of this: qqnorm
-```{r}
-v <- rnorm(100, 3, 2)
-qqnorm(v)
-qqline(v, col = 2)
-```
-The Q-Q line is drawn so that it passes through the first and third quantile. All of the points should be on this line when the sample is normal. 
-```{r}
-v <- rnorm(100, 0, 1)
-qqnorm(v)
-qqline(v, col = 2)
-```
- 
- 
-```{r}
-v <- rnorm(10000, 0, 1)
-qqnorm(v)
-qqline(v, col = 2)
-
-```
-Q-Q Plot to Compare Two Samples
-```{r}
-v1 <- rnorm(100, 0, 1)
-v2 <- rnorm(150, 3, 1)
-qqplot(v1, v2)
-
-```
 
 
