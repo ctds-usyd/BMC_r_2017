@@ -1,7 +1,7 @@
 ---
 title: "The Brain & Mind Centre"
 author: "Sydney Informatics Hub"
-subtitle: Day 1
+subtitle: Day 3
 output:
   html_document:
     hightlight: github
@@ -14,71 +14,9 @@ output:
 ---
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE,
-                      cache = TRUE)
+                      cache = FALSE)
 ```
-## Introduction to statistics with R
-R provides a wide range of functions to implement statistical analysis and modelling on data. 
-
-### Descriptive Statistics
-
-![Measures of Central Tendancy](central_tendency.gif)
-
-
-All the standard summary statistics are available in R including:
-
-- mean 
-- sd 
-- var
-- min
-- max
-- median
-- range
-- quantile
-
-
-```{r}
-x <- c(1,3,5,2,9)
-mean(x)
-```
-If there are missing values:
-```{r}
-x <- c(1,3,5,2,9,NA,7,10)
-mean(x)
-mean(x, na.rm=TRUE)
-```
-
-we can ignore them by setting `na.rm=TRUE`.
-
-```{r}
-x<-c(155, 160, 171, 182, 162, 153, 190, 167, 168, 165, 191)
-median(x)
-var(x)     # variance
-sd(x)      # standard deviation
-```
-In R, you can use the function `quantile()` to get median and quartiles, or you can
-also use the function `summary()`, to get the quantiles as well as the mean:
-```{r}
-# mean,median,25th and 75th quartiles,min,max
-summary(x)
-```
-
-You get most of the same summary statistics visually from a boxplot:
-```{r}
-boxplot(x,
-        horizontal = T)
-```
-
-
-
-
-
-There are other functions and packages to obtain summary of statistics of the datasets:
-
-- `sapply()`
-- `pastecs()`
-- `stat.desc()`
-- `describe()` in the Hmisc package
-- `describe()` psych package
+### Preliminary Step: load example data
 
 Read in (again) the gambling dataset:
 ```{r}
@@ -104,139 +42,307 @@ strptime( date.string , format = "%d %B %Y" ) -> gambling.data$Date
 brisbane.only <- gambling.data[gambling.data$Local.Govt.Area=="BRISBANE",]
 
 # Choose only the brisbane data from 2010
-row.indicies <- (brisbane.only$Date>="2010-01-01 AEST" &
-                 brisbane.only$Date<="2010-12-31 AEST")
-brisbane.2010.data <- brisbane.only[row.indicies,]
+#row.indicies <- (brisbane.only$Date>="2010-01-01 AEST" &
+#                 brisbane.only$Date<="2010-12-31 AEST")
+#brisbane.2010.data <- brisbane.only[row.indicies,]
 ```
 
-## Histogram
-One way to look at the distribution is to plot a histogram of the counts of the data. To obtain a histogram, the scale of the variable is divided into consecutive intervals and the number of observations in each interval
-is counted.
+## Introduction to statistics with R
+One of the really cool things about R, as opposed to other languages like python, matlab etc. is that it has such a wide user base in the statistics community and many packages that have been developed to analyze data with old and new statistical techniques and modelling. Most of these (but not all) are available on CRAN. Although we won't cover much beyond the basics today (which could just as easily be done in most other languages), more advanced things like bayesian techniques
+
+
+### Descriptive Statistics
+
+![Measures of Central Tendency](central_tendency.gif)
+
+
+All the standard summary statistics are available in R including:
+
+- mean 
+- sd 
+- var
+- min
+- max
+- median
+- range
+- quantile
+
+
 ```{r}
-x <- rnorm(1000)
-hist(x, freq=F)
-boxplot(x, horizontal = T)
+x <- c(1,3,5,2,9,NA,7,10,15,4,7,7)
+x
+mean(x)
 ```
-Histogram with ggplot2:
-```{r warning=F, echo=F}
+If there are missing values, we can ignore them by setting `na.rm=TRUE`:
+```{r}
+mean(x, na.rm=TRUE)
+```
+
+```{r}
+median(x,na.rm = T)
+var(x, na.rm = T)     # variance
+sd(x, na.rm = T)      # standard deviation
+```
+In R, you can use the function `quantile()` to get median and quartiles, or you can
+also use the function `summary()`, to get the quantiles as well as the mean, and the number of NA values:
+```{r}
+quantile(x, na.rm = T)
+
+# mean,median,25th and 75th quartiles,min,max
+summary(x)
+```
+
+### Visual Summaries: Box plots and Histograms
+
+You get most of the same summary statistics visually from a boxplot: (in base R graphics)
+```{r}
+boxplot(x, horizontal = TRUE)
+```
+
+
+Or alternatively in ggplot:
+
+```{r}
 library(ggplot2)
-ggplot(data=data.frame(x=x), aes(x=x))+
-  geom_histogram()+
+
+some.LGAs<-sample(gambling.data$Local.Govt.Area,5)
+
+subset.data<-gambling.data[gambling.data$Local.Govt.Area %in% some.LGAs,]
+
+ggplot(data=subset.data,
+       aes(x=Local.Govt.Area,y=Approved.EGMs))+
+  geom_boxplot()+
+  scale_y_log10()+
+  coord_flip()+
   theme_minimal()
+
 ```
 
+
+We can also look at the histogram of the counts of the data. To obtain a histogram, the scale of the variable is divided into consecutive intervals and the number of observations in each interval
+is counted.
+
 ```{r}
-library(ggplot2)
-ggplot(data=gambling.data, aes(x=Player.Money.Lost))+
+hist(x)
+```
+
+
+Or plot a histogram in ggplot:
+
+
+```{r,warning=F,message=F}
+ggplot(data=subset.data,
+       aes(x=Approved.EGMs,fill=Local.Govt.Area))+
   geom_histogram()+
   scale_x_log10()+
   theme_minimal()
 ```
 
-```{r}
-library(ggplot2)
-qplot(gambling.data$Player.Money.Lost,
-      geom="histogram",
-      binwidth = 1000000,  
-      main = "Histogram for win", 
-      xlab = "Player money lost",  
-      fill=I("blue"))
-```
-
-### Boxplot
-Boxplot also gives an overview of the distribution of the data. It is often used to compare data across different groups. A boxplot is a graphical representation of median and quartiles:
-```{r}
-boxplot(x)
-```
+### Correlation
 
 ```{r}
-MyData <- gambling.data[ which(gambling.data$Local.Govt.Area %in% c("BALONNE",
-                                                                    "GLADSTONE",
-                                                                    "MACKAY", 
-                                                                    "SCENIC RIM")) ,]
-# Boxplot of Win for different LGA (selected)
-boxplot(MyData$Player.Money.Lost ~ MyData$Local.Govt.Area)
-```
-Plot using ggplot:
-```{r}
-p10 <- ggplot(MyData, aes(x = Local.Govt.Area, y = Player.Money.Lost)) +
-        geom_boxplot() +
-        xlab("")
-p10
-```
-###Q-Q Normal Plots
-When A and B have the same distribution the Q-Q plot is a 45 degree straight line.
-In many instances we need to know if a sample comes from a normal distribution, then the Q-Q plot of A against the standard normal distribution.
-NOTE: This will be a straight line if the distribution of A is normal of any mean and standard deviation. 
-There is an R function that does all of this: qqnorm
-```{r}
-v <- rnorm(100, 3, 2)
-qqnorm(v)
-qqline(v, col = 2)
-```
-The Q-Q line is drawn so that it passes through the first and third quantile. All of the points should be on this line when the sample is normal. 
-```{r}
-v <- rnorm(100, 0, 1)
-qqnorm(v)
-qqline(v, col = 2)
-```
- 
- 
-```{r}
-v <- rnorm(10000, 0, 1)
-qqnorm(v)
-qqline(v, col = 2)
+x1=sin(1:100/3)
+y1=sin(1:100/3)
+plot(x1,y1)
 
-```
-Q-Q Plot to Compare Two Samples
-```{r}
-v1 <- rnorm(100, 0, 1)
-v2 <- rnorm(150, 3, 1)
-qqplot(v1, v2)
+cor(x1,y1)
 
-```
-The most common normalization is the z-transformation, where you subtract the mean and divide by the standard deviation of your variable. The result will have mean=0 and sd=1.
-```{r}
-v1 <- rnorm(100, 3, 5)
-hist(v1)
-#zVar <- (myVar - mean(myVar)) / sd(myVar)
-v1_z <- ((v1 - 3)/5)
-hist(v1_z)
 
+x2=rnorm(100)
+y2=rnorm(100)
+plot(x2,y2)
+
+cor(x2,y2)
 ```
 
-##  Hypothesis testing 
-A hypothesis test will tell you the probability that the data you have is generated by the model (your hypothesis).
-For example, I may have rolled two dice
+Calculating correlations for many variables at once
 
-
-
-A hypothesis test can determine whether an associative relationship exists, e.g.: is the weight of response to unit change in input larger than zero?
-
-Firstly we set  α, arbitrary critical thresholds of probability (P-values). The P-value approach involves determining "likely" or "unlikely" by determining the probabilityby assuming the null hypothesis were true.  If the P-value is small (less than or equal to α), then we will reject the null Hypothesis in favor of the alternative hypothesis ("unlikely"); and, if the P-value is greater than α, then the null hypothesis is not rejected.
-Common  α, to determine if the result are statistically significant are P<0.05, P<0.01 and P<0.001.  
-Which statistical test you use depends on the type of data you have collected and the question you wish to ask. 
-
-### hypothesis tests for population means: One-sample hypothesis test
-Let x represents a sample collected from a normal population with unknown mean and standard deviation. We want to test if the population mean is equal to 9, at significance level 5%.
-The R function t.test() can be used to perform both one and two sample t-tests. 
-The function contains a variety of options and can be called as follows:
-t.test(x, y = NULL, alternative = c("two.sided", "less", "greater"), mu = 0, paired = FALSE, var.equal = FALSE, conf.level = 0.95).
 
 ```{r}
-x= c(6.2, 6.6, 7.1, 7.4, 7.6, 7.9, 8, 8.3, 8.4, 8.5, 8.6,
-     8.8, 8.8, 9.1, 9.2, 9.4, 9.4, 9.7, 9.9, 10.2, 10.4, 10.8, 11.3, 11.9)      
-# Entering the data
-t.test(x-9, alternative="two.sided", conf.level=0.95)                             # Performing the t-test
+#install.packages("corrplot")
+library(corrplot)
+
+MoneyDateLGA<-gambling.data[,c("Player.Money.Lost","Date","Local.Govt.Area")]
+
+spreaddata<-tidyr::spread(MoneyDateLGA,3,1)
+
+#remove the columns with NA values
+spreaddata$TORRES<-NULL
+spreaddata$LONGREACH<-NULL
+spreaddata$BALONNE<-NULL
+
+#plot corrplot
+corrplot(cor(spreaddata[,-1]),
+         order="hclust",
+         tl.cex = .5, 
+         tl.col = "black")
 ```
-###Interpretation of the result
+
+
+### Pair plots
+
+```{r}
+#install.packages("GGally")
+library(GGally)
+
+ggpairs(gambling.data[,-c(1,2)])
+```
+
+
+
+
+There are other functions and packages to obtain summary statistics of the datasets:
+
+- `stat.desc()` in the pastecs package
+- `describe()` in the Hmisc package
+- `describe()` in the psych package...
+
+## Simple Linear Regression
+
+Simple linear regression is useful for examining or modelling the relationship between two variables.
+
+```{r}
+ggplot(data=gambling.data,
+       aes(x=Operational.EGMs,
+           y=Player.Money.Lost,
+           color=Local.Govt.Area,
+           group=1))+
+  guides(color=FALSE)+
+  geom_point()+
+  geom_smooth(method = "lm",se=TRUE)
+```
+
+
+Fit a linear regression and look at a summary of its results. The model is of the form $y= mx+c$ where $y=$`Player.Money.Lost` and $x=$`Operational.EGMs`
+
+```{r}
+dollars_per_machine_model <- lm(Player.Money.Lost ~ Operational.EGMs, 
+                                data = gambling.data)
+summary(dollars_per_machine_model)
+
+```
+
+```{r}
+attributes(dollars_per_machine_model)
+```
+
+```{r}
+dollars_per_machine_model$coefficients 
+```
+
+```{r}
+confint(dollars_per_machine_model)
+```
+
+```{r} 
+anova(dollars_per_machine_model)
+
+```
+
+
+```{r}
+# visualize residuals and fitted values.
+plot(dollars_per_machine_model, 
+     pch=16, 
+     which=1)
+
+
+hist(dollars_per_machine_model$residuals,
+     breaks=1000,
+     xlim=c(-2e6,2e6))
+
+sd(dollars_per_machine_model$residuals)
+```
+
+### Multiple Linear Regression
+
+We can make a much better model by including more variables. The functions we will use are exactly the same though.
+
+```{r}
+dollars_model <- lm(Player.Money.Lost ~ Operational.EGMs + Operational.Sites + as.numeric(Date) + Local.Govt.Area, 
+                                data = gambling.data)
+summary(dollars_model)
+
+plot(dollars_model, 
+     pch=16, 
+     which=1)
+
+
+hist(dollars_model$residuals,
+     breaks=1000,
+     xlim=c(-2e6,2e6))
+
+sd(dollars_model$residuals)
+```
+
+
+## Hypothesis testing 
+A hypothesis test (or more precisely a p-value from a hypothesis test) will tell you the probability that the data you have is generated by the null model (your null hypothesis).
+
+![](redDie.jpg) 
+
+For example, I may have rolled a red die 10 times and got the following results:
+
+```{r}
+redDie<-c(6, 4, 4, 6, 2, 1, 4, 6, 5, 2)
+```
+
+Let's say that my "null model" is that the mean of many rolls will be 3.5, i.e., the result we would expect, on average, if the die is fair.
+
+```{r}
+mean(redDie)
+```
+
+Is this data consistent with our hypothesis?
+
+```{r}
+redDieTTest<-t.test(redDie, alternative="two.sided", mu = 3.5 ,conf.level=0.95)
+redDieTTest
+```
+
+
+
+```{r}
+names(redDieTTest)
+
+redDieTTest$parameter
+redDieTTest$p.value
+
+redDieTTest$conf.int
+redDieTTest$estimate
+redDieTTest$null.value
+redDieTTest$alternative
+redDieTTest
+```
+
+
+![](blueDie.jpg) 
+
+
+I then rolled a blue die 10 times and got the following results from it:
+
+```{r}
+blueDie<-c(5, 1, 4, 2, 3, 1, 5, 4, 4, 1)
+```
+
+Are the mean values for ten roll different between the red and blue die (within statistical uncertainty) ?
+
+```{r}
+redblueDieTTest<-t.test(redDie,blueDie, alternative="two.sided", mu = 0 ,conf.level=0.95)
+redblueDieTTest
+```
+
+
+
+
+### Interpretation of the result
 The P-value (0.3622) is greater than the significance level 5% (1-0.95), so we conclude that the null hypothesis that the mean of this population is 9 is plausible.
 ```{r}
 v <- rnorm(10,9, 6)
 t.test(v-0, alternative="two.sided", conf.level=0.95)  
 ```
 
-### homogeneous variances
+### Homogeneous variances
 Before proceeding with the t-test, it is necessary to evaluate the sample variances of the two groups, using a Fisher’s F-test to verify the homoskedasticity (homogeneity of variances). In R you can do this in this way:
 
 ```{r}
@@ -261,29 +367,6 @@ For samples with Homogeneous variances (var.equal = TRUE),and independent sample
 t.test(a,b, var.equal=TRUE, paired=FALSE)
 ```
 
-###Interpretation of the result
-The P-value (0.3348) is greater than the significance level 5% (1-0.95), so we conclude that the null hypothesis that the population means are equal is plausible.
-Indeed the value of t-computed is less than the tabulated t-value for 18 degrees of freedom, which in R we can calculate:
-
-```{r}
-qt(0.975, 18)
-
-```
-
-This confirms that we can accept the null hypothesis H0 of equality of the means.
-
-
-
-### Confidence interval
-If we are interested in finding the confidence interval for the difference of two population means, the R-command "t.test" is also to be used.
-
-```{r}
-x=c(418,421,421,422,425,427,431,434,437,439,446,447,448,453,454,463,465)          # Entering the data into the R-workspace
-y=c(429,430,430,431,36,437,440,441,445,446,447)
-test2<-t.test(x,y,alternative="two.sided",mu=0,var.equal=F,conf.level=0.95)       # Performing a t-test procedure, containing a confidence interval computation
-test2
-```
-We obtained p-value greater than 0.05, then we can conclude that the averages of two groups are significantly similar. 
 
 ### Conducting Chi-Squared Test of Independence 
 The chi-square test of independence is a parametric method appropriate for testing independence between two categorical variables. 
@@ -297,13 +380,17 @@ Dataset use here is survey, the Smoke column records the students smoking habit,
 ```{r}
 library(MASS)       # load the MASS package 
 tbl <- table(survey$Smoke, survey$Exer) 
-tbl                 # the contingency table
-
+tbl<-tbl[c(2,3,4,1),]                 # the contingency table
+tbl
 ```
 See the relationship using barplot:
 
 ```{r}
-barplot( tbl, beside=T, legend=T)
+barplot(tbl, 
+        beside=T, 
+        legend=T,
+        xlab = "Exercise",
+        ylab = "Number of People")
 
 ```
 
@@ -323,15 +410,16 @@ To avoid such warning, we can combine the second and third columns of tbl, and s
 ctbl = cbind(tbl[,"Freq"], tbl[,"None"] + tbl[,"Some"]) 
 ctbl 
  EX_SM<- chisq.test(ctbl) 
+ EX_SM
 ```
 
 ```{r}
 attributes(EX_SM)
 ```
-If the assumptions of Chi-square test are met we may considerusing Fisher's Exact test that is non-parametric alternative to the Chi-Square test. 
+If the assumptions of Chi-square test are met we may consider using Fisher's Exact test that is non-parametric alternative to the Chi-Square test. 
 
 ```{r}
-fisher.test (tbl, conf.int=T, conf.level=0.99)
+fisher.test(tbl, conf.int=T, conf.level=0.99)
 
 ```
 
@@ -423,74 +511,6 @@ We will reject the null hypothesis.
 
 
 
-## Simple Linear Regression
-Simple linear regression is useful for examing or modelling the realtionship between two numeric variables.
-We can also fit a simple linear regression using a categorical explanatory (X) variables. 
-
-```{r}
- # load the package that contains the full dataset and the data viz package.
-library(car)
-library(ggplot2) # for some nice looking graphs!
-library(MASS) # Another library for our box-cox transform down the end.
-
-```
-```{r}
-# Inspect and summarize the data.
-head(Prestige,5)
-```
-
-
-```{r}
-
-# Subset the data to capture only income and education.
-newdata = Prestige[,c(1:2)]
-summary(newdata)
-```
-```{r}
- plot(newdata$education, newdata$income)
-
-```
-
-```{r}
-# fit a linear model and run a summary of its results.
-set.seed(1)
-education.c = scale(newdata$education, center=TRUE, scale=FALSE)
-mod = lm(income ~ education.c, data = newdata)
-summary(mod)
-
-```
-
-```{r}
-attributes(mod)
-```
-
-```{r}
-mod$coefficients # sam as coef(mod), mod$coef
-
-```
-
-```{r}
-confint(mod)
-```
-
-```{r} 
-anova(mod)
-
-```
-
-```{r}
-# visualize the model results.
-qplot(education.c, income, data = newdata, main = "Relationship between Income and Education") +
-  stat_smooth(method="lm", col="red") +
-  scale_y_continuous(breaks = c(1000, 2000, 4000, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 20000, 25000), minor_breaks = NULL)
-
-```
-
-```{r}
-# visualize residuals and fitted values.
-plot(mod, pch=16, which=1)
-
-```
 
 ## Normal Distribution
 ![Normal Distribution](Standard_deviation_diagram.png)
@@ -514,7 +534,36 @@ rnorm(n = 4, mean = 2, sd = 2)
 Visual ways of checking the distribution of data are histogram, boxplots, and Q-Q plot.  
 
 
+### Q-Q Normal Plots
+When A and B have the same distribution the Q-Q plot is a 45 degree straight line.
+In many instances we need to know if a sample comes from a normal distribution, then the Q-Q plot of A against the standard normal distribution.
+NOTE: This will be a straight line if the distribution of A is normal of any mean and standard deviation. 
+There is an R function that does all of this: qqnorm
+```{r}
+v <- rnorm(100, 3, 2)
+qqnorm(v)
+qqline(v, col = 2)
+```
+The Q-Q line is drawn so that it passes through the first and third quantile. All of the points should be on this line when the sample is normal. 
+```{r}
+v <- rnorm(100, 0, 1)
+qqnorm(v)
+qqline(v, col = 2)
+```
+ 
+ 
+```{r}
+v <- rnorm(10000, 0, 1)
+qqnorm(v)
+qqline(v, col = 2)
 
+```
+Q-Q Plot to Compare Two Samples
+```{r}
+v1 <- rnorm(100, 0, 1)
+v2 <- rnorm(150, 3, 1)
+qqplot(v1, v2)
 
+```
 
 
