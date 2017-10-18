@@ -61,6 +61,17 @@ also use the function `summary()`, to get the quantiles as well as the mean:
 # mean,median,25th and 75th quartiles,min,max
 summary(x)
 ```
+
+You get most of the same summary statistics visually from a boxplot:
+```{r}
+boxplot(x,
+        horizontal = T)
+```
+
+
+
+
+
 There are other functions and packages to obtain summary of statistics of the datasets:
 
 - `sapply()`
@@ -98,33 +109,13 @@ row.indicies <- (brisbane.only$Date>="2010-01-01 AEST" &
 brisbane.2010.data <- brisbane.only[row.indicies,]
 ```
 
-## Normal Distribution
-![Normal Distribution](Standard_deviation_diagram.png)
-
-A common distribution which is used in several statistical tests is a normal distribution. A standard normal distributed dataset is a dataset with standard deviation $\sigma=1$ and mean $\mu=0$, if you don't provide these arguments, then these values are assumed.
-
-`pnorm(q)` gives the integrated probability up to `q` standard deviations away from the mean
-```{r}
-pnorm(q = 2)
-pnorm(q = 0)
-```
-`qnorm(p)` gives the number of standard deviations away from the mean to get an integrated probability of `p`
-```{r}
-qnorm(p = 0.95)
-qnorm(p = 0.025, mean = 2, sd = 0.5)
-```
-`rnorm(n)` gives a vector of `n` random samples from the standard normal distribution (or you can specify a mean and a standard deviation)
-```{r}
-rnorm(n = 4, mean = 2, sd = 2)
-```
-Visual ways of checking the distribution of data are histogram, boxplots, and Q-Q plot.  
-
 ## Histogram
 One way to look at the distribution is to plot a histogram of the counts of the data. To obtain a histogram, the scale of the variable is divided into consecutive intervals and the number of observations in each interval
 is counted.
 ```{r}
 x <- rnorm(1000)
 hist(x, freq=F)
+boxplot(x, horizontal = T)
 ```
 Histogram with ggplot2:
 ```{r warning=F, echo=F}
@@ -344,7 +335,7 @@ fisher.test (tbl, conf.int=T, conf.level=0.99)
 
 ```
 
-## Anova: One-Way Analysis of Variance (ANOVA)
+### Anova: One-Way Analysis of Variance (ANOVA)
 Anova is a parameteric method appropriate for comparing the Means for the 2 or more in dependent populations. 
 ```{r}
 attach(InsectSprays)
@@ -432,7 +423,7 @@ We will reject the null hypothesis.
 
 
 
-### Simple Linear Regression
+## Simple Linear Regression
 Simple linear regression is useful for examing or modelling the realtionship between two numeric variables.
 We can also fit a simple linear regression using a categorical explanatory (X) variables. 
 
@@ -501,9 +492,26 @@ plot(mod, pch=16, which=1)
 
 ```
 
-##Exploratory Factor Analysis in R
+## Normal Distribution
+![Normal Distribution](Standard_deviation_diagram.png)
 
+A common distribution which is used in several statistical tests is a normal distribution. A standard normal distributed dataset is a dataset with standard deviation $\sigma=1$ and mean $\mu=0$, if you don't provide these arguments, then these values are assumed.
 
+`pnorm(q)` gives the integrated probability up to `q` standard deviations away from the mean
+```{r}
+pnorm(q = 2)
+pnorm(q = 0)
+```
+`qnorm(p)` gives the number of standard deviations away from the mean to get an integrated probability of `p`
+```{r}
+qnorm(p = 0.95)
+qnorm(p = 0.025, mean = 2, sd = 0.5)
+```
+`rnorm(n)` gives a vector of `n` random samples from the standard normal distribution (or you can specify a mean and a standard deviation)
+```{r}
+rnorm(n = 4, mean = 2, sd = 2)
+```
+Visual ways of checking the distribution of data are histogram, boxplots, and Q-Q plot.  
 
 
 
