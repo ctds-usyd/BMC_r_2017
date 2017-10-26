@@ -1,4 +1,4 @@
----
+  ---
 title: "The Brain & Mind Centre"
 author: "Sydney Informatics Hub"
 subtitle: Day 2
